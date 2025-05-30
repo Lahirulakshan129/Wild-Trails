@@ -1,12 +1,15 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { Card } from "../ui/driverDashboard-ui/card";
 import PropTypes from "prop-types";
-import SightingForm from "./AnimalSightingForm"; // Component for adding sightings
+import SightingForm from "./AnimalSightingForm";
+
+// Marker pool for recycling markers
+const MARKER_POOL_SIZE = 20;
+let markerPool = [];
 
 const MapSection = ({ selectedLocation, setSelectedLocation }) => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
-  const markersRef = useRef([]);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [apiError, setApiError] = useState(null);
   const [sightings, setSightings] = useState([]);
@@ -15,33 +18,28 @@ const MapSection = ({ selectedLocation, setSelectedLocation }) => {
     animalType: 'all',
     timeRange: '10min'
   });
-  const getAnimalIconUrl = (animalType) => {
-    const lower = animalType.toLowerCase();
-    const base = "public/animal-icons"; // Put icons in `public/animal-icons` folder
-  
-    switch (lower) {
-      case "elephant":
-        return `${base}/elephant.png`;
-      case "leopard":
-        return `${base}/leopard.png`;
-      case "deer":
-        return `${base}/deer.png`;
-      case "peacock":
-        return `${base}/peacock.png`;
-      // add more cases as needed
-      default:
-        return `${base}/default.png`; // fallback icon
-    }
-  };
-  
 
-  // Dummy data - replace with real API calls later
-  const dummySightings = [
+  // Get marker from pool or create new one
+  const getMarker = () => {
+    if (markerPool.length > 0) {
+      return markerPool.pop();
+    }
+    return new window.google.maps.marker.AdvancedMarkerElement();
+  };
+
+  // Return marker to pool
+  const releaseMarker = (marker) => {
+    marker.map = null;
+    markerPool.push(marker);
+  };
+
+  // Dummy data
+  const dummySightings = useMemo(() => [
     {
       id: '1',
       animal_type: 'Elephant',
-      location_lat: 6.471,
-      location_lng: 81.671,
+      location_lat: 6.536939,
+      location_lng: 81.707786,
       timestamp: new Date().toISOString(),
       image_url: null,
       reported_by: 'driver-1',
@@ -51,8 +49,8 @@ const MapSection = ({ selectedLocation, setSelectedLocation }) => {
       id: '2',
       animal_type: 'Leopard',
       location_lat: 6.473,
-      location_lng: 81.673,
-      timestamp: new Date(Date.now() - 5 * 60000).toISOString(), // 5 mins ago
+      location_lng: 81.675,
+      timestamp: new Date(Date.now() - 5 * 60000).toISOString(),
       image_url: null,
       reported_by: 'driver-2',
       notes: 'Resting on a tree'
@@ -62,12 +60,12 @@ const MapSection = ({ selectedLocation, setSelectedLocation }) => {
       animal_type: 'Bear',
       location_lat: 6.469,
       location_lng: 81.675,
-      timestamp: new Date(Date.now() - 15 * 60000).toISOString(), // 15 mins ago (should be filtered out)
+      timestamp: new Date(Date.now() - 15 * 60000).toISOString(),
       image_url: null,
       reported_by: 'driver-3',
       notes: 'Crossing the road'
     }
-  ];
+  ], []);
 
   // Load Google Maps script
   useEffect(() => {
@@ -77,7 +75,8 @@ const MapSection = ({ selectedLocation, setSelectedLocation }) => {
     }
 
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&loading=async&libraries=marker&callback=initMap`;    script.async = true;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&loading=async&libraries=marker&callback=initMap`;
+    script.async = true;
     script.defer = true;
     script.onerror = () => setApiError("Failed to load Google Maps API");
 
@@ -101,123 +100,101 @@ const MapSection = ({ selectedLocation, setSelectedLocation }) => {
           lng: selectedLocation.lng
         },
         zoom: 12,
-        mapId: "6bbf28f0a2a779649aa95dc3", // Add this line
+        mapId: "6bbf28f0a2a779649aa95dc3",
         disableDefaultUI: true,
         gestureHandling: "greedy"
       });
-      // Add click listener for reporting sightings
-      // const listener = mapInstanceRef.current.addListener("click", (e) => {
-      //   const clickedLocation = {
-      //     lat: e.latLng.lat(),
-      //     lng: e.latLng.lng()
-      //   };
-      //   setSelectedLocation(clickedLocation);
-      //   setShowForm(true);
-      // });
 
       return () => {
-        window.google.maps.event.removeListener(listener);
+        if (mapInstanceRef.current) {
+          window.google.maps.event.clearInstanceListeners(mapInstanceRef.current);
+        }
       };
     } catch (error) {
       console.error("Error initializing map:", error);
       setApiError("Error initializing map");
     }
-  }, [mapLoaded, selectedLocation, setSelectedLocation]);
+  }, [mapLoaded, selectedLocation]);
 
-  // Load dummy data
+  // Load dummy data with time-based filtering
   useEffect(() => {
-    // Filter out sightings older than 10 minutes immediately
-    const now = new Date();
-    const tenMinutesAgo = new Date(now.getTime() - 10 * 60000);
-    const recentSightings = dummySightings.filter(s => new Date(s.timestamp) >= tenMinutesAgo);
-    setSightings(recentSightings);
-    
-    // Simulate periodic updates
-    const interval = setInterval(() => {
-      // In a real app, this would fetch from API
+    const filterSightings = () => {
       const now = new Date();
       const tenMinutesAgo = new Date(now.getTime() - 10 * 60000);
-      const recentSightings = dummySightings.filter(s => new Date(s.timestamp) >= tenMinutesAgo);
-      setSightings(recentSightings);
+      return dummySightings.filter(s => new Date(s.timestamp) >= tenMinutesAgo);
+    };
+
+    setSightings(filterSightings());
+    
+    const interval = setInterval(() => {
+      setSightings(filterSightings());
     }, 30000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [dummySightings]);
 
-  // Filter sightings based on criteria
-  const getFilteredSightings = () => {
+  // Get filtered sightings
+  const filteredSightings = useMemo(() => {
     const now = new Date();
     const tenMinutesAgo = new Date(now.getTime() - 10 * 60000);
 
     return sightings.filter(sighting => {
-      // Check if sighting is within the last 10 minutes
       const isRecent = new Date(sighting.timestamp) >= tenMinutesAgo;
-      
-      // Apply animal type filter
       const matchesAnimalType = filters.animalType === 'all' || 
         sighting.animal_type.toLowerCase() === filters.animalType.toLowerCase();
       
       return isRecent && matchesAnimalType;
     });
-  };
+  }, [sightings, filters]);
 
-  // Update markers with filtered sightings
+  // Update markers with optimized approach
   useEffect(() => {
     if (!mapLoaded || !mapInstanceRef.current) return;
 
     try {
-      // Clear existing markers
-      markersRef.current.forEach(marker => marker.map = null);
-      markersRef.current = [];
+      // First release all markers back to pool
+      markerPool.forEach(releaseMarker);
+      markerPool = [];
 
-      const { AdvancedMarkerElement, PinElement } = window.google.maps.marker;
-      const filteredSightings = getFilteredSightings();
-
+      // Create optimized markers
       filteredSightings.forEach(sighting => {
-        // Use your own logic or mapping here
-        const iconUrl = getAnimalIconUrl(sighting.animal_type);
-      
-        const img = document.createElement("img");
-        img.src = iconUrl;
-        img.alt = sighting.animal_type;
-        img.style.width = "40px";
-        img.style.height = "40px";
-        img.style.borderRadius = "50%";
-        img.style.border = "2px solid white";
-        img.style.boxShadow = "0 0 5px rgba(0,0,0,0.3)";
-        img.style.background = "white";
-      
-        const marker = new window.google.maps.marker.AdvancedMarkerElement({
-          position: {
-            lat: sighting.location_lat,
-            lng: sighting.location_lng
-          },
-          map: mapInstanceRef.current,
-          content: img,
-          title: `${sighting.animal_type} - ${new Date(sighting.timestamp).toLocaleString()}`
-        });
-      
-        markersRef.current.push(marker);
+        const marker = getMarker();
+        
+        const pinWrapper = document.createElement("div");
+        pinWrapper.innerHTML = `
+          <div style="position:relative;width:30px;height:40px">
+            <svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 0C6.7 0 0 6.7 0 15c0 8.2 15 27 15 27s15-18.8 15-27C30 6.7 23.3 0 15 0z" fill="${getAnimalColor(sighting.animal_type)}"/>
+            </svg>
+            <div style="position:absolute;top:5px;left:5px;width:20px;height:20px;border-radius:50%;border:2px solid white;background:white;display:flex;align-items:center;justify-content:center">
+              ${getAnimalInitial(sighting.animal_type)}
+            </div>
+          </div>
+        `;
+
+        marker.position = { lat: sighting.location_lat, lng: sighting.location_lng };
+        marker.map = mapInstanceRef.current;
+        marker.content = pinWrapper;
+        marker.title = `${sighting.animal_type} - ${new Date(sighting.timestamp).toLocaleString()}`;
+
+        markerPool.push(marker);
       });
-      
+
     } catch (error) {
       console.error("Error updating markers:", error);
     }
-  }, [mapLoaded, sightings, filters]);
 
-  // Handle new sighting submission (dummy implementation)
-  const handleAddSighting = (sightingData) => {
-    const newSighting = {
-      id: `dummy-${Math.random().toString(36).substr(2, 9)}`,
-      ...sightingData,
-      reported_by: 'current-user',
-      timestamp: new Date().toISOString()
+    return () => {
+      // Cleanup markers on unmount
+      markerPool.forEach(marker => {
+        marker.map = null;
+        if (marker.content) {
+          marker.content.remove();
+        }
+      });
+      markerPool = [];
     };
-    
-    setSightings(prev => [...prev, newSighting]);
-    setShowForm(false);
-    alert('Sighting added (dummy data - will be lost on refresh)');
-  };
+  }, [mapLoaded, filteredSightings]);
 
   // Helper functions
   const getAnimalColor = (name) => {
@@ -248,7 +225,6 @@ const MapSection = ({ selectedLocation, setSelectedLocation }) => {
         </div>
       )}
 
-      {/* Controls overlay */}
       <div className="absolute top-4 right-4 flex flex-col space-y-2">
         <div className="bg-white p-2 rounded shadow">
           <label className="block text-sm font-medium mb-1">Animal Type</label>
@@ -272,13 +248,21 @@ const MapSection = ({ selectedLocation, setSelectedLocation }) => {
         </button>
       </div>
 
-      {/* Sighting form modal */}
       {showForm && (
         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-4 rounded-lg max-w-md w-full">
             <SightingForm
               location={selectedLocation}
-              onSubmit={handleAddSighting}
+              onSubmit={(data) => {
+                const newSighting = {
+                  id: `dummy-${Math.random().toString(36).substr(2, 9)}`,
+                  ...data,
+                  reported_by: 'current-user',
+                  timestamp: new Date().toISOString()
+                };
+                setSightings(prev => [...prev, newSighting]);
+                setShowForm(false);
+              }}
               onCancel={() => setShowForm(false)}
             />
           </div>
