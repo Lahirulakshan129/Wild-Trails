@@ -1,9 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '../components/home/Header';
 import Footer from '../components/home/Footer';
 import Mapbox from '../components/driverDashboard/MapSection';
 
 export default function DriverDashboard() {
+  
+const [selectedLocation, setSelectedLocation] = useState({
+  lat: 6.48553,
+  lng: 81.68975,
+});
+
+const [sightings, setSightings] = useState([
+  {
+    id: "1",
+    animalName: "Elephant",
+    dateTime: "2025-05-25T10:30:00",
+    location: { lat: 6.4853, lng: 81.6853 },
+  },
+  {
+    id: "2",
+    animalName: "Leopard",
+    dateTime: "2025-05-25T09:15:00",
+    location: { lat: 6.4803, lng: 81.6793 },
+  },
+  {
+    id: "3",
+    animalName: "Crocodile",
+    dateTime: "2025-05-25T08:30:00",
+    location: { lat: 6.4873, lng: 81.6923 },
+  },
+]); 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-0">
       <div className="w-full h-screen bg-[#F8F9FA] relative">
@@ -15,7 +41,11 @@ export default function DriverDashboard() {
           <div className="flex-1 container mx-auto p-4 overflow-hidden">
             <div className="h-full w-full flex flex-col lg:flex-row gap-4">
               {/* Map Section */}
-              <Mapbox/>
+              <Mapbox
+                selectedLocation={selectedLocation}
+                setSelectedLocation={setSelectedLocation}
+                sightings={sightings}
+              />
               {/* Sidebar Section */}
               <div className="w-full lg:w-1/3 h-full flex flex-col space-y-4 overflow-auto">
                 {/* Animal Sighting Form */}
