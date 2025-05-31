@@ -40,7 +40,7 @@ export default function DriverDashboard() {
           <Header />
 
           {/* Body content  */}
-          <div className="flex-1 container mx-auto p-4 overflow-hidden">
+          <div className="flex-1 container mx-auto p-4 overflow-hidden scrollbar-hide">
             <div className="h-full w-full flex flex-col lg:flex-row gap-4">
               {/* Map Section */}
               <Mapbox
@@ -49,7 +49,7 @@ export default function DriverDashboard() {
                 sightings={sightings}
               />
               {/* Sidebar Section */}
-              <div className="w-full lg:w-1/3 h-full flex flex-col space-y-4 overflow-auto">
+              <div className="w-full lg:w-1/3 h-full flex flex-col space-y-4 overflow-auto  scrollbar-hide">
                 {/* Animal Sighting Form */}
                 <div className="bg-white rounded-lg shadow-md p-4">
                   <h2 className="text-xl font-serif font-semibold text-[#264653] mb-4">
@@ -134,7 +134,7 @@ export default function DriverDashboard() {
                   <h2 className="text-xl font-serif font-semibold text-[#264653] mb-4">
                     Recent Sightings
                   </h2>
-                  <div className="h-[250px] rounded-md border overflow-auto space-y-3 p-2">
+                  <div className="h-[250px] rounded-md border overflow-auto scrollbar-hide space-y-3 p-2">
                     {/* Sightings can be mapped from props or state later */}
                     <div className="p-3 rounded-lg border hover:bg-gray-50">
                       <div className="flex">
@@ -200,32 +200,27 @@ export default function DriverDashboard() {
                 <div>
                   <Booking />
                 </div>
-               
               </div>{" "}
               {/* end sidebar */}
-              
             </div>
           </div>
         </div>
       </div>
-      <div>
-                  <div className="flex justify-end p-4">
-                    <button
-                      onClick={() =>
-                        setView(view === "list" ? "calendar" : "list")
-                      }
-                      className="bg-blue-600 text-white px-4 py-2 rounded-xl"
-                    >
-                      {view === "list" ? "Calendar View" : "List View"}
-                    </button>
-                  </div>
+      <div className="w-screen h-screen flex flex-col bg-white">
+        <div className="flex justify-end p-4">
+          <button
+            onClick={() => setView(view === "list" ? "calendar" : "list")}
+            className="bg-blue-600 text-white px-4 py-2 rounded-xl"
+          >
+            {view === "list" ? "Calendar View" : "List View"}
+          </button>
+        </div>
 
-                  {view === "calendar" ? (
-                    <Calender/>
-                  ) : (
-                    <Calender/>
-                  )}
-                </div>
+        <div className="flex-1 overflow-auto scrollbar-hide">
+          {view === "calendar" ? <Calender /> : <Calender />}
+        </div>
+      </div>
+
       {/* Footer */}
       <Footer />
     </main>
