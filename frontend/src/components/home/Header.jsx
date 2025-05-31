@@ -6,8 +6,8 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="bg-blue-800 text-white sticky top-0 z-50">
-      <div className="container max-w-full px-4 py-2 flex items-center justify-between">
+    <header className="bg-[#454442] text-white sticky top-0 z-50">
+      <div className="container max-w-full px-4 py-1 flex items-center justify-between">
         <div className="flex items-center">
           <div>
             <img
@@ -19,18 +19,18 @@ export default function Header() {
         </div>
 
         {/* Phone */}
-        <div className="hidden md:flex items-center text-white ml-5 px-3 py-2 bg-cyan-500 rounded-3xl">
+        <div className="hidden md:flex items-center text-white ml-[70px]  px-3 py-2 bg-[#212529] rounded-3xl font-[Inter]">
           <PhoneCall size={18} className="mr-2" />
-          <span className="font-medium ">+94 76 661 1421</span>
+          <span className="text-sm">+94 76 661 1421</span>
         </div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex justify-center flex-1 mx-8">
-          <ul className="flex space-x-6">
+        <nav className="hidden md:flex justify-center flex-1 mx-8 pl-[200px]">
+          <ul className="flex space-x-12 font-[Inter] ">
             <li>
               <Link
                 to="/"
-                className="text-white text-lg hover:text-safari-gold font-medium transition-colors"
+                className="text-white text-[12px] font-normal hover:text-safari-gold transition-colors"
               >
                 Travel Deals
               </Link>
@@ -38,7 +38,7 @@ export default function Header() {
             <li>
               <Link
                 to="/#tours"
-                className="text-white text-lg hover:text-safari-gold font-medium transition-colors"
+                className="text-white text-[12px] font-normal font-[Inter] hover:text-safari-gold transition-colors"
               >
                 Blog
               </Link>
@@ -46,7 +46,7 @@ export default function Header() {
             <li>
               <Link
                 to="/#about"
-                className="text-white text-lg hover:text-safari-gold font-medium transition-colors"
+                className="text-white text-[12px] font-normal font-[Inter] hover:text-safari-gold transition-colors"
               >
                 FAQS
               </Link>
@@ -54,7 +54,7 @@ export default function Header() {
             <li>
               <Link
                 to="/#activities"
-                className="text-white text-lg hover:text-safari-gold font-medium transition-colors"
+                className="text-white text-[12px] font-normal font-[Inter] hover:text-safari-gold transition-colors"
               >
                 Contact Us
               </Link>
@@ -65,13 +65,13 @@ export default function Header() {
         {/* Book Now Button */}
         <Link
           to="/#contact"
-          className="hidden md:block text-lg text-black px-5 py-2 mr-2 rounded hover:bg-safari-sand transition-colors font-medium"
+          className="hidden md:block text-[12px] font-normal font-[Inter] text-white px-5 py-2 mr-2 rounded-3xl border border-[#ffffff] bg-transparent hover:bg-safari-sand transition-colors"
         >
           Sign Up
         </Link>
         <Link
           to="/#contact"
-          className="hidden text-lg md:block bg-safari-gold text-black px-5 py-2 rounded hover:bg-safari-sand transition-colors font-medium"
+          className="hidden text-[12px] font-normal font-[Inter] md:block bg-[#EB5138] text-black px-5 py-2 rounded-3xl hover:bg-safari-sand transition-colors "
         >
           Log IN
         </Link>
@@ -84,7 +84,7 @@ export default function Header() {
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
-
+     
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden bg-black py-4">
