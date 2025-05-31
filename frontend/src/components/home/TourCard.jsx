@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom';
 
 export default function TourCard({ image, title, duration, time, maxPeople, price }) {
   return (
-    <div className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
       <div className="relative h-44 overflow-hidden">
         <img 
           src={image} 
           alt={title} 
-          className="w-full h-full object-cover"
+          className="w-full h-full rounded-xl object-cover"
         />
       </div>
 
