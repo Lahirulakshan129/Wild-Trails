@@ -6,22 +6,22 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="bg-black text-white sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-        {/* Logo */}
+    <header className="bg-blue-800 text-white sticky top-0 z-50">
+      <div className="container max-w-full px-4 py-2 flex items-center justify-between">
         <div className="flex items-center">
-          <div className="text-white font-bold text-xl flex items-center">
-            <div className="w-8 h-8 bg-safari-gold rounded-full mr-2 flex items-center justify-center text-black">
-              🌴
-            </div>
-            <span>Wild Trails</span>
+          <div>
+            <img
+              src="src/assets/logo.jpeg"
+              alt="Wild Trails Safari"
+              className="w-full h-10 object-cover"
+            />
           </div>
         </div>
 
         {/* Phone */}
-        <div className="hidden md:flex items-center text-white">
+        <div className="hidden md:flex items-center text-white ml-5 px-3 py-2 bg-cyan-500 rounded-3xl">
           <PhoneCall size={18} className="mr-2" />
-          <span className="font-medium">+94 76 661 1421</span>
+          <span className="font-medium ">+94 76 661 1421</span>
         </div>
 
         {/* Desktop Navigation */}
@@ -30,39 +30,31 @@ export default function Header() {
             <li>
               <Link
                 to="/"
-                className="text-white hover:text-safari-gold font-medium transition-colors"
+                className="text-white text-lg hover:text-safari-gold font-medium transition-colors"
               >
-                Home
+                Travel Deals
               </Link>
             </li>
             <li>
               <Link
                 to="/#tours"
-                className="text-white hover:text-safari-gold font-medium transition-colors"
+                className="text-white text-lg hover:text-safari-gold font-medium transition-colors"
               >
-                Tours
+                Blog
               </Link>
             </li>
             <li>
               <Link
                 to="/#about"
-                className="text-white hover:text-safari-gold font-medium transition-colors"
+                className="text-white text-lg hover:text-safari-gold font-medium transition-colors"
               >
-                About
+                FAQS
               </Link>
             </li>
             <li>
               <Link
                 to="/#activities"
-                className="text-white hover:text-safari-gold font-medium transition-colors"
-              >
-                Activities
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/#contact"
-                className="text-white hover:text-safari-gold font-medium transition-colors"
+                className="text-white text-lg hover:text-safari-gold font-medium transition-colors"
               >
                 Contact Us
               </Link>
@@ -72,8 +64,14 @@ export default function Header() {
 
         {/* Book Now Button */}
         <Link
-          to="/DriverDashboard"
-          className="hidden md:block bg-safari-gold text-black px-5 py-2 rounded hover:bg-safari-sand transition-colors font-medium"
+          to="/#contact"
+          className="hidden md:block text-lg text-black px-5 py-2 mr-2 rounded hover:bg-safari-sand transition-colors font-medium"
+        >
+          Sign Up
+        </Link>
+        <Link
+          to="/#contact"
+          className="hidden text-lg md:block bg-safari-gold text-black px-5 py-2 rounded hover:bg-safari-sand transition-colors font-medium"
         >
           Log IN
         </Link>
@@ -140,11 +138,11 @@ export default function Header() {
                 </li>
                 <li>
                   <Link
-                    to="/DriverDashboard"
+                    to="/#contact"
                     className="block w-full bg-safari-gold text-black px-5 py-2 rounded hover:bg-safari-sand transition-colors font-medium text-center mt-2"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Driver Dashboard
+                    BOOK
                   </Link>
                 </li>
               </ul>
