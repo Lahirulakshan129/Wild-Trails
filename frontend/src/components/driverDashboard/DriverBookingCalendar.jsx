@@ -1,6 +1,8 @@
 import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css'
+import '../driverDashboard/custom-css/calendar-custom.css';
 import { useState } from 'react'
+import { FaSun, FaMoon, FaCalendarDay } from 'react-icons/fa'
 
 const dummyBookings = [
   {
@@ -35,10 +37,13 @@ const getStatusColor = status => {
   }
 }
 
-const timeSlotLabel = slot => {
-  if (slot === 'morning') return '☀️'
-  if (slot === 'evening') return '🌙'
-  return '📅'
+const getSlotIcon = slot => {
+  switch (slot) {
+    case 'morning': return <FaSun className="text-white text-xs" />
+    case 'evening': return <FaMoon className="text-white text-xs" />
+    case 'full': return <FaCalendarDay className="text-white text-xs" />
+    default: return null
+  }
 }
 
 export default function DriverBookingCalendar() {
@@ -55,14 +60,14 @@ export default function DriverBookingCalendar() {
     const dateStr = date.toISOString().split('T')[0]
     const dayBookings = bookingsByDate[dateStr] || []
     return (
-      <div className="flex flex-wrap justify-center items-center space-x-1 mt-1">
+      <div className="flex flex-wrap justify-center items-center gap-1 mt-1">
         {dayBookings.map((b, idx) => (
           <span
             key={idx}
-            className={`text-xs px-1 rounded-full ${getStatusColor(b.status)} text-white`}
+            className={`w-5 h-5 flex items-center justify-center rounded-full ${getStatusColor(b.status)} shadow-md`}
             title={`${b.timeSlot} - ${b.tourType}`}
           >
-            {timeSlotLabel(b.timeSlot)}
+            {getSlotIcon(b.timeSlot)}
           </span>
         ))}
       </div>
@@ -76,28 +81,45 @@ export default function DriverBookingCalendar() {
   }
 
   return (
-    <div className="p-4">
+    <div className="p-6 bg-gradient-to-br from-white via-blue-50 to-blue-100 rounded-xl shadow-xl">
       <Calendar
         onClickDay={showDetails}
         tileContent={tileContent}
-        tileClassName="min-h-[80px]"
+        tileClassName="min-h-[80px] transition-transform duration-200 hover:scale-105 rounded-lg"
+        className="rounded-xl overflow-hidden"
       />
 
       {selectedDate && (
-        <div className="mt-6">
-          <h2 className="text-lg font-bold mb-2">Bookings on {selectedDate.date}</h2>
+        <div className="mt-8">
+          <h2 className="text-xl font-bold text-blue-800 mb-4 border-b pb-2">
+            Bookings on {selectedDate.date}
+          </h2>
+
           {selectedDate.bookings.length === 0 ? (
-            <p>No bookings.</p>
+            <p className="text-gray-600 italic">No bookings found.</p>
           ) : (
-            <ul className="space-y-2">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {selectedDate.bookings.map((b, i) => (
-                <li key={i} className="p-2 border rounded-xl shadow-sm">
-                  <div><strong>Time Slot:</strong> {b.timeSlot}</div>
-                  <div><strong>Tour:</strong> {b.tourType}</div>
-                  <div><strong>Status:</strong> <span className={`${getStatusColor(b.status)} text-white px-2 py-0.5 rounded`}>{b.status}</span></div>
-                </li>
+                <div
+                  key={i}
+                  className="p-4 bg-white rounded-xl shadow-md border hover:shadow-lg transition"
+                >
+                  <div className="flex justify-between mb-2">
+                    <span className="font-semibold text-blue-700 capitalize">
+                      {b.timeSlot}
+                    </span>
+                    <span
+                      className={`${getStatusColor(b.status)} text-white px-2 py-0.5 rounded-full text-xs font-medium`}
+                    >
+                      {b.status}
+                    </span>
+                  </div>
+                  <div className="text-sm text-gray-700">
+                    <strong>Tour:</strong> {b.tourType}
+                  </div>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </div>
       )}

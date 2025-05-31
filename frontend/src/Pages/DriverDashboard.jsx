@@ -3,7 +3,7 @@ import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
 import Mapbox from "../components/driverDashboard/MapSection";
 import Booking from "../components/driverDashboard/DriverBookingDashboard";
-import calender from "../components/driverDashboard/DriverBookingCalendar";
+import Calender from "../components/driverDashboard/DriverBookingCalendar";
 
 export default function DriverDashboard() {
   const [view, setView] = useState("list");
@@ -200,7 +200,15 @@ export default function DriverDashboard() {
                 <div>
                   <Booking />
                 </div>
-                <div>
+               
+              </div>{" "}
+              {/* end sidebar */}
+              
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
                   <div className="flex justify-end p-4">
                     <button
                       onClick={() =>
@@ -213,17 +221,11 @@ export default function DriverDashboard() {
                   </div>
 
                   {view === "calendar" ? (
-                    <calender/>
+                    <Calender/>
                   ) : (
-                    <calender/>
+                    <Calender/>
                   )}
                 </div>
-              </div>{" "}
-              {/* end sidebar */}
-            </div>
-          </div>
-        </div>
-      </div>
       {/* Footer */}
       <Footer />
     </main>
