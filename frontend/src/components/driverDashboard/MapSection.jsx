@@ -155,8 +155,7 @@ const MapSection = ({ selectedLocation, setSelectedLocation }) => {
       // First release all markers back to pool
       markerPool.forEach(releaseMarker);
       markerPool = [];
-
-      // Create optimized markers
+      // Then create new markers for filtered sightings
       filteredSightings.forEach(sighting => {
         const marker = getMarker();
         

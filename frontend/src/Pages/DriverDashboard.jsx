@@ -1,41 +1,43 @@
-import React, { useState } from 'react';
-import Header from '../components/home/Header';
-import Footer from '../components/home/Footer';
-import Mapbox from '../components/driverDashboard/MapSection';
+import React, { useState } from "react";
+import Header from "../components/home/Header";
+import Footer from "../components/home/Footer";
+import Mapbox from "../components/driverDashboard/MapSection";
+import Booking from "../components/driverDashboard/DriverBookingDashboard";
+import calender from "../components/driverDashboard/DriverBookingCalendar";
 
 export default function DriverDashboard() {
-  
-const [selectedLocation, setSelectedLocation] = useState({
-  lat: 6.48553,
-  lng: 81.68975,
-});
+  const [view, setView] = useState("list");
+  const [selectedLocation, setSelectedLocation] = useState({
+    lat: 6.48553,
+    lng: 81.68975,
+  });
 
-const [sightings, setSightings] = useState([
-  {
-    id: "1",
-    animalName: "Elephant",
-    dateTime: "2025-05-25T10:30:00",
-    location: { lat: 6.4853, lng: 81.6853 },
-  },
-  {
-    id: "2",
-    animalName: "Leopard",
-    dateTime: "2025-05-25T09:15:00",
-    location: { lat: 6.4803, lng: 81.6793 },
-  },
-  {
-    id: "3",
-    animalName: "Crocodile",
-    dateTime: "2025-05-25T08:30:00",
-    location: { lat: 6.4873, lng: 81.6923 },
-  },
-]); 
+  const [sightings, setSightings] = useState([
+    {
+      id: "1",
+      animalName: "Elephant",
+      dateTime: "2025-05-25T10:30:00",
+      location: { lat: 6.4853, lng: 81.6853 },
+    },
+    {
+      id: "2",
+      animalName: "Leopard",
+      dateTime: "2025-05-25T09:15:00",
+      location: { lat: 6.4803, lng: 81.6793 },
+    },
+    {
+      id: "3",
+      animalName: "Crocodile",
+      dateTime: "2025-05-25T08:30:00",
+      location: { lat: 6.4873, lng: 81.6923 },
+    },
+  ]);
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-0">
       <div className="w-full h-screen bg-[#F8F9FA] relative">
         <div className="absolute inset-0 flex flex-col">
           {/* Header */}
-            <Header />
+          <Header />
 
           {/* Body content  */}
           <div className="flex-1 container mx-auto p-4 overflow-hidden">
@@ -55,7 +57,9 @@ const [sightings, setSightings] = useState([
                   </h2>
                   <form className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium mb-1">Animal Species</label>
+                      <label className="block text-sm font-medium mb-1">
+                        Animal Species
+                      </label>
                       <input
                         type="text"
                         placeholder="e.g., Elephant, Leopard"
@@ -63,21 +67,27 @@ const [sightings, setSightings] = useState([
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1">Date & Time</label>
+                      <label className="block text-sm font-medium mb-1">
+                        Date & Time
+                      </label>
                       <input
                         type="datetime-local"
                         className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1">Notes</label>
+                      <label className="block text-sm font-medium mb-1">
+                        Notes
+                      </label>
                       <textarea
                         className="w-full rounded-md border border-gray-300 px-3 py-2 h-20 focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]"
                         placeholder="Additional observations..."
                       ></textarea>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1">Location</label>
+                      <label className="block text-sm font-medium mb-1">
+                        Location
+                      </label>
                       <input
                         type="text"
                         readOnly
@@ -96,9 +106,17 @@ const [sightings, setSightings] = useState([
 
                 {/* SOS Button */}
                 <div className="bg-white rounded-lg shadow-md p-4">
-                  <h2 className="text-xl font-serif font-semibold text-[#264653] mb-3">Emergency Assistance</h2>
+                  <h2 className="text-xl font-serif font-semibold text-[#264653] mb-3">
+                    Emergency Assistance
+                  </h2>
                   <button className="w-full py-3 bg-[#E76F51] hover:bg-[#E76F51]/90 text-white font-bold rounded-md shadow-lg flex items-center justify-center space-x-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
                       <circle cx="12" cy="12" r="10"></circle>
                       <line x1="12" y1="8" x2="12" y2="12"></line>
                       <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -106,23 +124,34 @@ const [sightings, setSightings] = useState([
                     <span>SEND SOS</span>
                   </button>
                   <p className="text-xs text-gray-500 mt-2">
-                    For emergency situations only. Sends your current location to park rangers.
+                    For emergency situations only. Sends your current location
+                    to park rangers.
                   </p>
                 </div>
 
                 {/* Recent Sightings */}
                 <div className="bg-white rounded-lg shadow-md p-4">
-                  <h2 className="text-xl font-serif font-semibold text-[#264653] mb-4">Recent Sightings</h2>
+                  <h2 className="text-xl font-serif font-semibold text-[#264653] mb-4">
+                    Recent Sightings
+                  </h2>
                   <div className="h-[250px] rounded-md border overflow-auto space-y-3 p-2">
                     {/* Sightings can be mapped from props or state later */}
                     <div className="p-3 rounded-lg border hover:bg-gray-50">
                       <div className="flex">
                         <div className="text-3xl mr-3">🐘</div>
                         <div>
-                          <h3 className="font-medium text-[#264653]">Elephant</h3>
-                          <p className="text-sm text-gray-500">May 25, 10:30 AM</p>
-                          <p className="text-xs text-gray-400">6.4853, 81.6853</p>
-                          <p className="text-sm text-gray-600 mt-1">Family of 5 elephants near the watering hole</p>
+                          <h3 className="font-medium text-[#264653]">
+                            Elephant
+                          </h3>
+                          <p className="text-sm text-gray-500">
+                            May 25, 10:30 AM
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            6.4853, 81.6853
+                          </p>
+                          <p className="text-sm text-gray-600 mt-1">
+                            Family of 5 elephants near the watering hole
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -131,10 +160,18 @@ const [sightings, setSightings] = useState([
                       <div className="flex">
                         <div className="text-3xl mr-3">🐆</div>
                         <div>
-                          <h3 className="font-medium text-[#264653]">Leopard</h3>
-                          <p className="text-sm text-gray-500">May 25, 09:15 AM</p>
-                          <p className="text-xs text-gray-400">6.4803, 81.6793</p>
-                          <p className="text-sm text-gray-600 mt-1">Spotted on a tree branch</p>
+                          <h3 className="font-medium text-[#264653]">
+                            Leopard
+                          </h3>
+                          <p className="text-sm text-gray-500">
+                            May 25, 09:15 AM
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            6.4803, 81.6793
+                          </p>
+                          <p className="text-sm text-gray-600 mt-1">
+                            Spotted on a tree branch
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -143,23 +180,52 @@ const [sightings, setSightings] = useState([
                       <div className="flex">
                         <div className="text-3xl mr-3">🐊</div>
                         <div>
-                          <h3 className="font-medium text-[#264653]">Crocodile</h3>
-                          <p className="text-sm text-gray-500">May 25, 08:30 AM</p>
-                          <p className="text-xs text-gray-400">6.4873, 81.6923</p>
-                          <p className="text-sm text-gray-600 mt-1">Large crocodile sunbathing on river bank</p>
+                          <h3 className="font-medium text-[#264653]">
+                            Crocodile
+                          </h3>
+                          <p className="text-sm text-gray-500">
+                            May 25, 08:30 AM
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            6.4873, 81.6923
+                          </p>
+                          <p className="text-sm text-gray-600 mt-1">
+                            Large crocodile sunbathing on river bank
+                          </p>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div> {/* end sidebar */}
+                <div>
+                  <Booking />
+                </div>
+                <div>
+                  <div className="flex justify-end p-4">
+                    <button
+                      onClick={() =>
+                        setView(view === "list" ? "calendar" : "list")
+                      }
+                      className="bg-blue-600 text-white px-4 py-2 rounded-xl"
+                    >
+                      {view === "list" ? "Calendar View" : "List View"}
+                    </button>
+                  </div>
+
+                  {view === "calendar" ? (
+                    <calender/>
+                  ) : (
+                    <calender/>
+                  )}
+                </div>
+              </div>{" "}
+              {/* end sidebar */}
             </div>
           </div>
         </div>
       </div>
-        {/* Footer */}
-        <Footer />
+      {/* Footer */}
+      <Footer />
     </main>
-    
   );
 }
