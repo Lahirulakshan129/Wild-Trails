@@ -4,7 +4,7 @@ export default function ToursSection() {
   const tours = [
     {
       id: 1,
-      image: '',
+      image: 'src/assets/image1.jpeg',
       title: 'Morning Safari',
       duration: '3 hours',
       time: '5:30 AM - 8:30 AM',
@@ -13,7 +13,7 @@ export default function ToursSection() {
     },
     {
       id: 2,
-      image: '',
+      image: 'src/assets/image2.jpg',
       title: 'Full Day Safari',
       duration: '8 hours',
       time: '5:30 AM - 1:30 PM',
@@ -22,7 +22,7 @@ export default function ToursSection() {
     },
     {
       id: 3,
-      image: '',
+      image: 'src/assets/image3.jpg',
       title: 'Evening Safari',
       duration: '3 hours',
       time: '2:30 PM - 5:30 PM',
@@ -35,7 +35,7 @@ export default function ToursSection() {
     <section id="tours" className="py-16 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-8">
-          <h2 className="text-safari-charcoal font-serif text-3xl font-normal mb-4">Explore The Wild</h2>
+          <h2 className="text-safari-charcoal font-caveat text-4xl font-normal mb-4">Explore The Wild</h2>
           <p className="text-safari-charcoal/80 max-w-3xl mx-auto text-sm">
             Embark deep into Sri Lanka&apos;s wildlife with our exceptional guided safaris, tailored for every type of traveler. 
             From sunrise to sunset, discover breathtaking natural landscapes and the untouched beauty of nature.
