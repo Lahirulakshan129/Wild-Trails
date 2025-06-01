@@ -2,25 +2,25 @@ export default function ActivitiesSection() {
   const activities = [
     {
       id: 1,
-      image: '',
-      title: 'Udawalawe Park',
+      image: 'src/assets/kudumbigala.JPG',
+      title: 'Kudumbigala Rock',
       description: 'Spot exotic wildlife species in their natural habitat'
     },
     {
       id: 2,
-      image: '',
+      image: 'src/assets/Lagoon_Boat_Tour.jpg',
       title: 'Lagoon Boat Tour',
       description: 'Experience the wilderness with premium comfort'
     },
     {
       id: 3,
-      image: '',
-      title: 'Tuk Tuk to Arugam Bay',
+      image: 'src/assets/Arugambay.webp',
+      title: 'Surfing in Arugam Bay',
       description: 'Explore beautiful coastal areas'
     },
     {
       id: 4,
-      image: '',
+      image: 'src/assets/cooking_class.webp',
       title: 'Cooking Class',
       description: 'Learn to prepare authentic Sri Lankan cuisine'
     }
@@ -30,7 +30,7 @@ export default function ActivitiesSection() {
     <section id="activities" className="py-16 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-8">
-          <h2 className="text-safari-charcoal font-serif text-3xl font-normal mb-2">Unforgettable Activities</h2>
+          <h2 className="text-safari-charcoal font-caveat text-4xl font-normal mb-2">Unforgettable Activities</h2>
           <p className="text-safari-charcoal/80 max-w-3xl mx-auto text-sm">
             The adventures doesn't stop with the safari alone.
           </p>
@@ -64,7 +64,7 @@ export default function ActivitiesSection() {
             href="/#contact" 
             className="bg-safari-green hover:bg-safari-light-green text-white px-6 py-2 rounded-full text-sm font-medium transition-colors inline-block"
           >
-            Plan My Activities
+            Plan My Holiday
           </a>
         </div>
       </div>
