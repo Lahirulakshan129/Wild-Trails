@@ -3,7 +3,7 @@ export default function AboutSection() {
     <section id="about" className="py-16 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-8">
-          <h2 className="text-safari-charcoal font-serif text-3xl font-normal mb-2">Who We Are</h2>
+          <h2 className="text-safari-charcoal font-caveat text-3xl font-normal mb-2">Who We Are</h2>
           <p className="text-safari-charcoal/80 max-w-2xl mx-auto text-sm">
             More than a tour company, we're a team of passionate locals dedicated to sharing the authentic 
             spirit of Sri Lanka's wildlife and culture. We are local, organic, and ethical.
@@ -23,12 +23,12 @@ export default function AboutSection() {
         </div>
 
         <div className="mt-10">
-          <h3 className="text-center font-serif text-2xl text-safari-charcoal mb-6">Our Story</h3>
+          <h3 className="text-center font-caveat text-2xl text-safari-charcoal mb-6">Our Story</h3>
 
           <div className="flex flex-col md:flex-row items-center max-w-4xl mx-auto">
             <div className="md:w-1/3 mb-8 md:mb-0">
               <img 
-                src="" 
+                src="src/assets/rushan.png" 
                 alt="Kumara Bandara" 
                 className="w-48 h-48 object-cover rounded-full mx-auto border-4 border-safari-green"
               />
