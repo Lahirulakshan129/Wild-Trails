@@ -90,5 +90,8 @@ export default {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')], // Fixed: Use 'require' instead of 'import'
+  plugins: [
+    require('tailwindcss-animate'),
+    require('tailwind-scrollbar-hide'),
+  ], 
 }
