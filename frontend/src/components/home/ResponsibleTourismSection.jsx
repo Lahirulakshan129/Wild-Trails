@@ -3,7 +3,7 @@ export default function ResponsibleTourismSection() {
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-8">
-          <h2 className="text-safari-charcoal font-serif text-3xl font-normal mb-2">
+          <h2 className="text-safari-charcoal font-caveat text-3xl font-normal mb-2">
             Responsible Tourism
           </h2>
         </div>
