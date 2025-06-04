@@ -1,9 +1,24 @@
 import { useState } from "react";
 import { PhoneCall, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import AuthModal from "../home/AuthModel";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isLoginView, setIsLoginView] = useState(true);
+
+  const openLoginModal = () => {
+    setIsLoginView(true);
+    setShowAuthModal(true);
+    setIsMenuOpen(false); // Close mobile menu if open
+  };
+
+  const openSignupModal = () => {
+    setIsLoginView(false);
+    setShowAuthModal(true);
+    setIsMenuOpen(false); // Close mobile menu if open
+  };
 
   return (
     <header className="bg-[#454442] text-white sticky top-0 z-50">
@@ -19,14 +34,14 @@ export default function Header() {
         </div>
 
         {/* Phone */}
-        <div className="hidden md:flex items-center text-white ml-[70px]  px-3 py-2 bg-[#212529] rounded-3xl font-[Inter]">
+        <div className="hidden md:flex items-center text-white ml-[70px] px-3 py-2 bg-[#212529] rounded-3xl font-[Inter]">
           <PhoneCall size={18} className="mr-2" />
           <span className="text-sm">+94 76 661 1421</span>
         </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex justify-center flex-1 mx-8 pl-[200px]">
-          <ul className="flex space-x-12 font-[Inter] ">
+          <ul className="flex space-x-12 font-[Inter]">
             <li>
               <Link
                 to="/"
@@ -62,19 +77,21 @@ export default function Header() {
           </ul>
         </nav>
 
-        {/* Book Now Button */}
-        <Link
-          to="/#contact"
-          className="hidden md:block text-[12px] font-normal font-[Inter] text-white px-5 py-2 mr-2 rounded-3xl border border-[#ffffff] bg-transparent hover:bg-safari-sand transition-colors"
-        >
-          Sign Up
-        </Link>
-        <Link
-          to="/#contact"
-          className="hidden text-[12px] font-normal font-[Inter] md:block bg-[#EB5138] text-black px-5 py-2 rounded-3xl hover:bg-safari-sand transition-colors "
-        >
-          Log IN
-        </Link>
+        {/* Auth Buttons */}
+        <div className="hidden md:flex items-center gap-2">
+          <button
+            onClick={openSignupModal}
+            className="text-[12px] font-normal font-[Inter] text-white px-5 py-2 rounded-3xl border border-[#ffffff] bg-transparent hover:bg-safari-sand transition-colors"
+          >
+            Sign Up
+          </button>
+          <button
+            onClick={openLoginModal}
+            className="text-[12px] font-normal font-[Inter] bg-[#EB5138] text-white px-5 py-2 rounded-3xl hover:bg-[#d1452e] transition-colors"
+          >
+            Log In
+          </button>
+        </div>
 
         {/* Mobile Menu Button */}
         <button
@@ -84,7 +101,7 @@ export default function Header() {
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
-     
+
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden bg-black py-4">
@@ -97,7 +114,7 @@ export default function Header() {
                     className="block text-white hover:text-safari-gold font-medium transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Home
+                    Travel Deals
                   </Link>
                 </li>
                 <li>
@@ -106,7 +123,7 @@ export default function Header() {
                     className="block text-white hover:text-safari-gold font-medium transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Tours
+                    Blog
                   </Link>
                 </li>
                 <li>
@@ -115,7 +132,7 @@ export default function Header() {
                     className="block text-white hover:text-safari-gold font-medium transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    About
+                    FAQS
                   </Link>
                 </li>
                 <li>
@@ -124,31 +141,39 @@ export default function Header() {
                     className="block text-white hover:text-safari-gold font-medium transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Activities
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/#contact"
-                    className="block text-white hover:text-safari-gold font-medium transition-colors"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
                     Contact Us
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    to="/#contact"
-                    className="block w-full bg-safari-gold text-black px-5 py-2 rounded hover:bg-safari-sand transition-colors font-medium text-center mt-2"
-                    onClick={() => setIsMenuOpen(false)}
+                <li className="pt-4 border-t border-gray-700">
+                  <button
+                    onClick={openSignupModal}
+                    className="block w-full text-white border border-white px-5 py-2 rounded-3xl hover:bg-safari-sand transition-colors font-medium text-center"
                   >
-                    BOOK
-                  </Link>
+                    Sign Up
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={openLoginModal}
+                    className="block w-full bg-[#EB5138] text-white px-5 py-2 rounded-3xl hover:bg-[#d1452e] transition-colors font-medium text-center"
+                  >
+                    Log In
+                  </button>
                 </li>
               </ul>
             </nav>
           </div>
         </div>
+      )}
+
+      {/* Auth Modal */}
+      {showAuthModal && (
+        <AuthModal
+          onClose={() => setShowAuthModal(false)}
+          isLogin={isLoginView}
+          switchToLogin={() => setIsLoginView(true)}
+          switchToSignup={() => setIsLoginView(false)}
+        />
       )}
     </header>
   );
