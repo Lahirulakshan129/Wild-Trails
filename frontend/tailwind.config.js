@@ -10,6 +10,7 @@ export default {
       sans: ['Source Sans 3', 'ui-sans-serif', 'system-ui'],
       serif: ['Playfair Display', 'ui-serif', 'Georgia'],
       body: ['Lora', 'ui-serif', 'Georgia'],
+      caveat: ['Caveat', 'cursive'], // Added here (no duplicate 'theme' needed)
     },
     extend: {
       backgroundImage: {
@@ -89,5 +90,8 @@ export default {
       },
     },
   },
-  plugins: [import('tailwindcss-animate')],
+  plugins: [
+    require('tailwindcss-animate'),
+    require('tailwind-scrollbar-hide'),
+  ], 
 }

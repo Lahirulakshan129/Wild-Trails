@@ -5,7 +5,7 @@ export default function ContactSection() {
     <section id="contact" className="py-12 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-8">
-          <h2 className="text-safari-charcoal font-serif text-3xl font-normal mb-2">Contact Us</h2>
+          <h2 className="text-safari-charcoal font-caveat text-3xl font-normal mb-2">Contact Us</h2>
           <p className="text-safari-charcoal/80 max-w-2xl mx-auto text-sm">
             Have questions or ready to book your adventure? Reach out to us and we'll help you plan your perfect Sri Lankan safari experience.
           </p>
