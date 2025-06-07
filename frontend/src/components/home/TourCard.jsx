@@ -1,9 +1,10 @@
 import { Clock, Calendar, Users } from 'lucide-react';
+import { Link } from 'react-router-dom'; // ✅ Added this line
 
 export default function TourCard({ image, title, time, duration, maxPeople }) {
   return (
     <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-      {/* Image section - now properly displayed */}
+      {/* Image section */}
       <div className="relative h-48 overflow-hidden">
         <img 
           src={image} 
@@ -16,7 +17,9 @@ export default function TourCard({ image, title, time, duration, maxPeople }) {
       </div>
 
       <div className="p-4">
-        <h3 className="text-center font-serif text-lg font-medium text-safari-charcoal mb-2">{title}</h3>
+        <h3 className="text-center font-serif text-lg font-medium text-safari-charcoal mb-2">
+          {title}
+        </h3>
 
         <div className="space-y-3 mb-6">
           <div className="flex items-center justify-center text-sm text-safari-charcoal">
