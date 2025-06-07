@@ -11,6 +11,7 @@ export default {
       serif: ['Playfair Display', 'ui-serif', 'Georgia'],
       body: ['Lora', 'ui-serif', 'Georgia'],
       caveat: ['Caveat', 'cursive'], // Added here (no duplicate 'theme' needed)
+      aref: ['Aref Ruqaa', 'ui-serif', 'Georgia'],
     },
     extend: {
       backgroundImage: {
