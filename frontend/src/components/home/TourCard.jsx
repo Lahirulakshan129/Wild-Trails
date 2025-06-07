@@ -43,7 +43,7 @@ export default function TourCard({ image, title, time, duration, maxPeople }) {
             to="/#contact" 
             className="bg-safari-green text-white px-4 py-1.5 rounded-full text-xs font-medium hover:bg-safari-light-green transition-colors w-full text-center"
           >
-            Book Now
+            Book Now &gt;&gt;
           </Link>
         </div>
       </div>
