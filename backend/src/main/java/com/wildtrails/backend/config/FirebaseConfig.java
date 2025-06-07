@@ -1,0 +1,29 @@
+package com.wildtrails.backend.config;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+
+import org.springframework.context.annotation.Configuration;
+
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import jakarta.annotation.PostConstruct;
+@Configuration
+public class FirebaseConfig {
+
+    @PostConstruct
+    public void initialize() throws IOException {
+        FileInputStream serviceAccount =
+            new FileInputStream("src/main/resources/wildtrails-60d05-firebase-adminsdk-fbsvc-1bd7649a64.json");
+
+        FirebaseOptions options = FirebaseOptions.builder()
+            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+            .build();
+
+        if (FirebaseApp.getApps().isEmpty()) {
+            FirebaseApp.initializeApp(options);
+        }
+    }
+
+}
