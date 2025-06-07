@@ -42,7 +42,7 @@ export default function FeaturesSection() {
                 {feature.icon}
               </div>
               <h3 className="font-serif text-base font-medium mb-1">{feature.title}</h3>
-              <p className="font-aref bg-[#C6E3B3] mx-8 py-1 rounded-xl text-safari-charcoal/80 text-base">{feature.description}</p>
+              <p className="bg-yellow-200 mx-8 py-1 rounded-xl text-safari-charcoal/80 text-base">{feature.description}</p>
             </div>
           ))}
         </div>
@@ -50,7 +50,7 @@ export default function FeaturesSection() {
         <div className="text-center mt-8">
           <a 
             href="/#contact" 
-            className="font-aref bg-safari-green hover:bg-safari-light-green text-[#0D722A] px-6 py-2 rounded-full text-base font-medium transition-colors inline-block"
+            className="bg-safari-green hover:bg-safari-light-green text-white px-6 py-2 rounded-full text-base font-medium transition-colors inline-block"
           >
             Hire now &gt;&gt;&gt;
           </a>
