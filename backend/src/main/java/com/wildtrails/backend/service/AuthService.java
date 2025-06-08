@@ -2,15 +2,19 @@ package com.wildtrails.backend.service;
 
 import com.wildtrails.backend.dto.AuthResponse;
 import com.wildtrails.backend.dto.RegisterRequest;
+import com.wildtrails.backend.entity.Role;
 import com.wildtrails.backend.entity.User;
 import com.wildtrails.backend.repository.UserRepository;
 import com.wildtrails.backend.security.JwtUtil;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
     private final AuthenticationManager authenticationManager;
@@ -18,46 +22,52 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public AuthService(AuthenticationManager authenticationManager, UserRepository userRepository,PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
-        this.authenticationManager = authenticationManager;
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtUtil = jwtUtil;
-    }
-
-    public String login(String username, String password) {
-        Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password)
+    public String login(String email, String password) {
+        Authentication auth = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(email, password)
         );
         return jwtUtil.generateToken(auth);
     }
 
-    public User register(String username, String password, String role) {
-        if (userRepository.findByUsername(username).isPresent()) {
-            throw new RuntimeException("User already exists");
+    public AuthResponse registerDriver(RegisterRequest request) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new RuntimeException("Email already registered");
         }
 
         User user = User.builder()
-                .username(username)
-                .password(passwordEncoder.encode(password))
-                .role(role)
+                .name(request.getName())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(Role.DRIVER)
                 .build();
 
-        return userRepository.save(user);
+        userRepository.save(user);
+
+        String token = jwtUtil.generateToken(
+                new UsernamePasswordAuthenticationToken(user.getEmail(), request.getPassword())
+        );
+
+        return new AuthResponse(token);
     }
 
-    public AuthResponse registerDriver(RegisterRequest request) {
-    var user = User.builder()
-            .username(request.getUsername())
-            .email(request.getEmail())
-            .password(passwordEncoder.encode(request.getPassword()))
-            .role(Role.DRIVER)
-            .build();
+    public AuthResponse registerAdmin(RegisterRequest request) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new RuntimeException("Email already registered");
+        }
 
-    userRepository.save(user);
+        User user = User.builder()
+                .name(request.getName())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(Role.ADMIN)
+                .build();
 
-    var jwt = jwtService.generateToken(user);
+        userRepository.save(user);
 
-    return new AuthResponse(jwt);
-}
+        String token = jwtUtil.generateToken(
+                new UsernamePasswordAuthenticationToken(user.getEmail(), request.getPassword())
+        );
 
+        return new AuthResponse(token);
+    }
 }
