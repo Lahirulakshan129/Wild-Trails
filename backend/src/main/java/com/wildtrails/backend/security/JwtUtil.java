@@ -12,11 +12,15 @@ public class JwtUtil {
 
     private final SecretKey secretKey = Keys.hmacShaKeyFor("ZmFrZXNlY3JldGtleWZvcndpbGR0cmFpbG1hdGU=".getBytes());
     private final long expirationMillis = 24 * 60 * 60 * 1000; // 1 day
-
-    public String generateToken(Authentication authentication) {
-        String username = authentication.getName();
-        return Jwts.builder()
+    
+        public String generateToken(Authentication authentication) {
+            String username = authentication.getName();
+            return Jwts.builder()
                 .setSubject(username)
+                .claim("role", authentication.getAuthorities().stream()
+                        .findFirst()
+                        .map(Object::toString)
+                        .orElse("UNKNOWN"))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMillis))
                 .signWith(secretKey)
