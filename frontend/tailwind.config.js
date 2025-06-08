@@ -11,6 +11,7 @@ export default {
       serif: ['Playfair Display', 'ui-serif', 'Georgia'],
       body: ['Lora', 'ui-serif', 'Georgia'],
       caveat: ['Caveat', 'cursive'], // Added here (no duplicate 'theme' needed)
+      aref: ['Aref Ruqaa', 'ui-serif', 'Georgia'],
     },
     extend: {
       backgroundImage: {
@@ -64,7 +65,7 @@ export default {
           '5': 'hsl(var(--chart-5))',
         },
         safari: {
-          green: '#2a5c2a',
+          green: '#A0DA83',
           brown: '#78552b',
           gold: '#d9b95c',
           cream: '#fcf9f2',
@@ -72,6 +73,7 @@ export default {
           'light-green': '#4a7a4a',
           sand: '#e6d7b8',
           black: '#111111',
+          
         },
       },
       keyframes: {
