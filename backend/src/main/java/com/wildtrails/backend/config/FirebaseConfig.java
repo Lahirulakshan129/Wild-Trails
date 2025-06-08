@@ -15,7 +15,8 @@ public class FirebaseConfig {
     @PostConstruct
     public void initialize() throws IOException {
         FileInputStream serviceAccount =
-            new FileInputStream("src/main/resources/wildtrails-60d05-firebase-adminsdk-fbsvc-1bd7649a64.json");
+            new FileInputStream("src/main/resources/firebase/FBAuth.json");
+          //  getClass().getClassLoader().getResourceAsStream("firebase/firebase-config.json");
 
         FirebaseOptions options = FirebaseOptions.builder()
             .setCredentials(GoogleCredentials.fromStream(serviceAccount))

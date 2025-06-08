@@ -1,5 +1,6 @@
 package com.wildtrails.backend.config;
 
+import com.wildtrails.backend.security.FirebaseAuthenticationFilter;
 import com.wildtrails.backend.security.JwtAuthenticationFilter;
 import com.wildtrails.backend.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
@@ -20,23 +21,25 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomUserDetailsService userDetailsService;
+    private final FirebaseAuthenticationFilter firebaseAuthenticationFilter;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/login").permitAll()
-                .requestMatchers("/api/auth/register/driver", "/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/driver/**").hasRole("DRIVER")
-                .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
-                .anyRequest().authenticated()
-            )
-            .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        
-        return http.build();
-    }
+@Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .csrf(csrf -> csrf.disable())
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/api/auth/login").permitAll()
+            .requestMatchers("/api/auth/register/driver", "/api/admin/**").hasRole("ADMIN")
+            .requestMatchers("/api/driver/**").hasRole("DRIVER")
+            .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
+            .anyRequest().authenticated()
+        )
+        .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(firebaseAuthenticationFilter, JwtAuthenticationFilter.class); 
+    return http.build();
+}
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
