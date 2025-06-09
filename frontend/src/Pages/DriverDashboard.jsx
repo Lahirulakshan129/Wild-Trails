@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import Header from "../components/home/Header";
+import Header from "../components/driverDashboard/DriverHeader";
 import Footer from "../components/home/Footer";
 import Mapbox from "../components/driverDashboard/MapSection";
 import Booking from "../components/driverDashboard/DriverBookingDashboard";
 import Calender from "../components/driverDashboard/DriverBookingCalendar";
-
+import Sightingform from "../components/driverDashboard/AnimalSightingForm"
 export default function DriverDashboard() {
   const [view, setView] = useState("list");
   const [selectedLocation, setSelectedLocation] = useState({
@@ -51,59 +51,8 @@ export default function DriverDashboard() {
               {/* Sidebar Section */}
               <div className="w-full lg:w-1/3 h-full flex flex-col space-y-4 overflow-auto  scrollbar-hide">
                 {/* Animal Sighting Form */}
-                <div className="bg-white rounded-lg shadow-md p-4">
-                  <h2 className="text-xl font-serif font-semibold text-[#264653] mb-4">
-                    Record Animal Sighting
-                  </h2>
-                  <form className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-1">
-                        Animal Species
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g., Elephant, Leopard"
-                        className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1">
-                        Date & Time
-                      </label>
-                      <input
-                        type="datetime-local"
-                        className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1">
-                        Notes
-                      </label>
-                      <textarea
-                        className="w-full rounded-md border border-gray-300 px-3 py-2 h-20 focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]"
-                        placeholder="Additional observations..."
-                      ></textarea>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1">
-                        Location
-                      </label>
-                      <input
-                        type="text"
-                        readOnly
-                        value="6.48553, 81.68975"
-                        className="w-full rounded-md border border-gray-300 px-3 py-2 bg-gray-50"
-                      />
-                    </div>
-                    <button
-                      type="submit"
-                      className="w-full py-2 px-4 bg-[#2A9D8F] hover:bg-[#2A9D8F]/90 text-white font-medium rounded-md transition-colors"
-                    >
-                      Submit Sighting
-                    </button>
-                  </form>
-                </div>
-
+               
+                <Sightingform></Sightingform>
                 {/* SOS Button */}
                 <div className="bg-white rounded-lg shadow-md p-4">
                   <h2 className="text-xl font-serif font-semibold text-[#264653] mb-3">
