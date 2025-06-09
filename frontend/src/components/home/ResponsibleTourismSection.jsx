@@ -3,12 +3,13 @@ export default function ResponsibleTourismSection() {
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-8">
-          <h2 className="text-safari-charcoal font-caveat text-3xl font-normal mb-2">
+          <h2 className="font-aref font-bold text-xl text-black mb-3">
             Responsible Tourism
           </h2>
         </div>
 
         <div className="max-w-4xl mx-auto">
+        <p className="font-aref text-center text-safari-charcoal/80 max-w-2xl mx-auto text-sm">“Travel Light. Leave a Legacy”</p>
           <p className="text-safari-charcoal text-sm leading-relaxed mb-4">
             At Wild Trails, we firmly believe ecotourism should protect from nature — not take from it. 
             That's why we follow strict environmental practices in all our operations. Our safari vehicles use modern, low-emission engines, 
