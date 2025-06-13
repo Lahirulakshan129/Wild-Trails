@@ -2,8 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronDown, Bell } from "lucide-react";
 
-export default function DriverHeader() {
-  const [user, setUser] = useState(null);
+export default function DriverHeader({ setActivePanel, user }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -12,18 +11,12 @@ export default function DriverHeader() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-
     // Mock notifications (replace with real fetch)
     setNotifications([
       { id: 1, message: "Elephant sighting added to your route", time: "2 min ago" },
       { id: 2, message: "Admin assigned new safari group", time: "10 min ago" },
     ]);
 
-    // Close dropdowns on outside click
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
       if (notificationRef.current && !notificationRef.current.contains(e.target)) setShowNotifications(false);
@@ -110,13 +103,19 @@ export default function DriverHeader() {
                   <p className="text-gray-500 text-xs">Role: {user.role}</p>
                 </div>
                 <button
-                  onClick={() => navigate("/driver/profile")}
+                  onClick={() => {
+                    setActivePanel("profile");
+                    setMenuOpen(false);
+                  }}
                   className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
                 >
                   Profile
                 </button>
                 <button
-                  onClick={() => navigate("/driver/settings")}
+                  onClick={() => {
+                    setActivePanel("settings");
+                    setMenuOpen(false);
+                  }}
                   className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
                 >
                   Settings

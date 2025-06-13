@@ -5,11 +5,11 @@ import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "./config/firebaseConfig";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8080";
 
 export default function AuthModal({
-  
   onClose,
   isLogin,
   switchToLogin,
@@ -25,11 +25,12 @@ export default function AuthModal({
       const user = result.user;
       const token = await user.getIdToken();
   
-      await fetch(`${BASE_URL}/api/auth/firebase`, {
+      await fetch(`${BASE_URL}/api/auth/firebase/verify`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
+          "X-Auth-Type": "Firebase"
         },
       });
       localStorage.setItem("user", JSON.stringify({
@@ -38,7 +39,7 @@ export default function AuthModal({
         role: "CUSTOMER",
       }));
   
-      window.location.href = `${BASE_URL}/customer/dashboard`;
+    navigate(`/Customerdashboard`);
     } catch (err) {
       console.error("Google Login Error:", err);
     }
@@ -48,49 +49,84 @@ export default function AuthModal({
   const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const url = isLogin ? `${BASE_URL}/api/auth/login` : `${BASE_URL}/api/auth/register`;
-    const payload = isLogin
-      ? { email, password }
-      : { email, password, name };
   
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+    if (!isLogin) {
+      // Customer sign-up (only handled via Firebase)
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const token = await userCredential.user.getIdToken();
+        console.log(token);
+        await fetch(`${BASE_URL}/api/auth/firebase/verify`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer1 ${token}`,
+            "X-Auth-Type": "Firebase"
+          },
+        });
   
-      if (!response.ok) {
-        throw new Error("Authentication failed.");
+        localStorage.setItem("user", JSON.stringify({
+          email: userCredential.user.email,
+          name: name,
+          role: "CUSTOMER",
+        }));
+  
+        window.location.href = "/Customer_dashboard";
+      } catch (err) {
+        alert("Sign-up failed: " + err.message);
       }
+    } else {
+      // LOGIN flow: lookup and route accordingly
+      try {
+        const res = await fetch(`${BASE_URL}/api/auth/lookup?email=${email}`);
+        if (!res.ok) throw new Error("User not found.");
+        const { role } = await res.json();
   
-      const data = await response.json();
+        if (role === "CUSTOMER") {
+          // Firebase Login
+          await signInWithEmailAndPassword(auth, email, password);
+          const token = await auth.currentUser.getIdToken();
   
-      // Store token and user info
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data));
-      console.log(data)
-
-      const decodedToken = jwtDecode(data.token); 
-      const role = decodedToken.role;
-      console.log("Decoded role", role);
-      if (role === "ADMIN") {
-        navigate("/admin/dashboard");
-      } else if (role === "ROLE_DRIVER") {
-        console.log(data)
-        navigate("/DriverDashboard");
-      } else {
-        console.error("Unknown role:", role);
+          await fetch(`${BASE_URL}/api/auth/firebase`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+  
+          localStorage.setItem("user", JSON.stringify({
+            email: email,
+            name: auth.currentUser.displayName || name,
+            role: "CUSTOMER",
+          }));
+  
+          window.location.href = "/customer/dashboard";
+        } else {
+          // Admin / Driver login (Spring Boot)
+          const loginRes = await fetch(`${BASE_URL}/api/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+  
+          if (!loginRes.ok) throw new Error("Incorrect credentials.");
+          const data = await loginRes.json();
+  
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("user", JSON.stringify(data));
+          const decoded = jwtDecode(data.token);
+  
+          if (decoded.role === "ADMIN") navigate("/admin/dashboard");
+          else if (decoded.role === "ROLE_DRIVER") navigate("/DriverDashboard");
+        }
+      } catch (err) {
+        alert("Login failed: " + err.message);
       }
-  
-      onClose(); // Optionally close modal
-    } catch (err) {
-      console.error("Auth Error:", err);
-      alert("Login/Signup failed. Please check credentials.");
     }
   };
+  
+  
   
   return (
     <div
@@ -120,7 +156,7 @@ export default function AuthModal({
                 placeholder="Full Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full h-12 rounded-xl bg-[#e7eff3] px-4 text-[#0e171b] placeholder-[#4e7f97] focus:outline-none"
+                className="w-full h-12 rounded-xl bg-[#e7eff3] px-4 teaxt-[#0e171b] placeholder-[#4e7f97] focus:outline-none"
                 required
               />
             )}
