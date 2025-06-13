@@ -50,7 +50,7 @@ export default function FeaturesSection() {
         <div className="text-center mt-8">
           <a 
             href="/#contact" 
-            className="bg-safari-green hover:bg-safari-light-green text-[#0D722A] px-6 py-2 rounded-full text-base font-medium transition-colors inline-block"
+            className="font-aref bg-safari-green hover:bg-safari-light-green text-[#0D722A] px-6 py-2 rounded-full text-base font-medium transition-colors inline-block"
           >
             Hire now &gt;&gt;&gt;
           </a>
