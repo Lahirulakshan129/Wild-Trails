@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -23,23 +24,26 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final FirebaseAuthenticationFilter firebaseAuthenticationFilter;
 
-@Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-        .csrf(csrf -> csrf.disable())
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/auth/login").permitAll()
-            .requestMatchers("/api/auth/register/driver", "/api/admin/**").hasRole("ADMIN")
-            .requestMatchers("/api/driver/**").hasRole("DRIVER")
-            .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
-            .anyRequest().authenticated()
-        )
-        .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-        .addFilterBefore(firebaseAuthenticationFilter, JwtAuthenticationFilter.class); 
-    return http.build();
-}
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .cors(Customizer.withDefaults())
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/auth/firebase/**").permitAll()  // Firebase entrypoint
+                .requestMatchers("/api/auth/login", "/api/auth/lookup").permitAll()
+                .requestMatchers("/api/auth/register/driver", "/api/auth/register/admin").permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/driver/**").hasRole("DRIVER")
+                .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
+                .anyRequest().authenticated()
+            )
+            .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .addFilterBefore(firebaseAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
+        return http.build();
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {

@@ -1,5 +1,6 @@
 package com.wildtrails.backend.service;
 
+import com.wildtrails.backend.entity.Role;
 import com.wildtrails.backend.entity.User;
 import com.wildtrails.backend.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -34,7 +35,20 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
-               Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
         );
+    }
+
+    public User loadOrCreateCustomer(String email, String name, String uid) {
+        return userRepository.findByEmail(email).orElseGet(() -> {
+            User newUser = User.builder()
+                    .email(email)
+                    .name(name)
+                    .id(uid)
+                    .role(Role.CUSTOMER) // Assuming Role is an enum with CUSTOMER as one of the values
+                    .password("defaultPassword") // Replace with a secure default or generated password
+                    .build();
+            return userRepository.save(newUser);
+        });
     }
 }

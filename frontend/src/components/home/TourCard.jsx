@@ -16,7 +16,7 @@ export default function TourCard({ image, title, time, duration, maxPeople }) {
         />
       </div>
 
-      <div className="p-4">
+      <div className="p-4 font-aref">
         <h3 className="text-center font-serif text-lg font-medium text-safari-charcoal mb-2">
           {title}
         </h3>
@@ -41,9 +41,9 @@ export default function TourCard({ image, title, time, duration, maxPeople }) {
         <div className="flex justify-center">
           <Link 
             to="/#contact" 
-            className="bg-safari-green text-white px-4 py-1.5 rounded-full text-xs font-medium hover:bg-safari-light-green transition-colors w-full text-center"
+            className="font-aref bg-safari-green text-[#0D722A] px-4 py-1.5 rounded-full text-xs font-medium hover:bg-safari-light-green transition-colors w-full text-center"
           >
-            Book Now &gt;&gt;
+            Book Now &gt;&gt;&gt;
           </Link>
         </div>
       </div>
