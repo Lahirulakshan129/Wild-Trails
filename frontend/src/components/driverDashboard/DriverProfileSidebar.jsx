@@ -36,7 +36,7 @@ export default function DriverProfileSidebar({ isOpen, onClose, user }) {
           <div className="flex flex-col items-center text-center">
             <div className="relative">
               <img
-                src={user?.photo || "/driver-placeholder.png"}
+                src={user?.photo || "/Placeholders/person-placeholder.jpg"}
                 alt="Driver profile"
                 className="w-28 h-28 rounded-full object-cover border-4 border-green-200 shadow-md"
               />

@@ -104,7 +104,7 @@ export default function DriverHeader({ setActivePanel, user }) {
                 </div>
                 <button
                   onClick={() => {
-                    setActivePanel("profile");
+                    setActivePanel("profile", { user });
                     setMenuOpen(false);
                   }}
                   className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
@@ -113,7 +113,8 @@ export default function DriverHeader({ setActivePanel, user }) {
                 </button>
                 <button
                   onClick={() => {
-                    setActivePanel("settings");
+                    setActivePanel("settings", { user });
+                    console.log(user);
                     setMenuOpen(false);
                   }}
                   className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"

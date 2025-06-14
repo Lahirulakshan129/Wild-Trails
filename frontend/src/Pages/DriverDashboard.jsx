@@ -16,7 +16,7 @@ export default function DriverDashboard() {
     lat: 6.48553,
     lng: 81.68975,
   });
-  const [activePanel, setActivePanel] = useState(null); // Controls which sidebar is open
+  const [activePanel, setActivePanel] = useState(null); // State to manage active sidebar panel); 
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -25,7 +25,7 @@ export default function DriverDashboard() {
         const decoded = jwtDecode(token);
         setUser({
           name: decoded.name,
-          email: decoded.email,
+          email: decoded.sub,
           role: decoded.role,
         });
       } catch (error) {
