@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { X, Camera, Bell, Palette ,Clock} from "lucide-react";
 
-export default function DriverSettingsSidebar({ isOpen, onClose }) {
+export default function DriverSettingsSidebar({ isOpen, onClose,user }) {
   const [availability, setAvailability] = useState(true);
   const [notifications, setNotifications] = useState({
     email: true,

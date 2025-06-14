@@ -117,7 +117,7 @@ export default function AuthModal({
           localStorage.setItem("user", JSON.stringify(data));
           const decoded = jwtDecode(data.token);
   
-          if (decoded.role === "ADMIN") navigate("/admin/dashboard");
+          if (decoded.role === "ROLE_ADMIN") navigate("/AdminDashboard");
           else if (decoded.role === "ROLE_DRIVER") navigate("/DriverDashboard");
         }
       } catch (err) {
