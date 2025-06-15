@@ -8,10 +8,15 @@ import com.wildtrails.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -21,36 +26,80 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
 
+    private static final Logger logger = LoggerFactory.getLogger(FirebaseAuthenticationFilter.class);
     private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
-                                    FilterChain filterChain) throws IOException, jakarta.servlet.ServletException {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String idToken = authHeader.substring(7);
-            try {
-                FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
-                String email = decodedToken.getEmail();
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
+        String requestUri = request.getRequestURI();
+        logger.info("FirebaseAuthenticationFilter processing URI: {}", requestUri);
 
-                User user = userRepository.findByEmail(email)
-                        .orElseGet(() -> {
-                            User newUser = new User();
-                            newUser.setEmail(email);
-                            newUser.setName(decodedToken.getName());
-                            newUser.setPassword("FIREBASE"); // unused
-                            newUser.setRole(Role.CUSTOMER);
-                            return userRepository.save(newUser);
-                        });
-
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        user, null, Collections.singleton(user.getRole().toAuthority()));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-            } catch (Exception e) {
-               
-            }
+        // Only process Firebase endpoints
+        if (!requestUri.startsWith("/api/auth/firebase/") && !requestUri.equals("/api/auth/firebase")) {
+            logger.debug("Skipping FirebaseAuthenticationFilter for non-Firebase URI: {}", requestUri);
+            filterChain.doFilter(request, response);
+            return;
         }
+
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            logger.debug("No valid Bearer token found for Firebase URI: {}", requestUri);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        String idToken = authHeader.substring(7);
+        try {
+            logger.debug("Processing Firebase token for URI: {}", requestUri);
+            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
+            String email = decodedToken.getEmail();
+
+            if (email == null || email.isEmpty()) {
+                logger.warn("No email found in Firebase token for URI: {}", requestUri);
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            User user = userRepository.findByEmail(email)
+                    .orElseGet(() -> {
+                        User newUser = new User();
+                        newUser.setEmail(email);
+                        newUser.setName(decodedToken.getName() != null ? decodedToken.getName() : "Firebase User");
+                        newUser.setPassword("FIREBASE_AUTH"); // Placeholder, not used
+                        // Default to CUSTOMER, but allow dynamic role assignment if needed
+                        newUser.setRole(determineRole(decodedToken));
+                        logger.info("Creating new user for email: {} with role: {}", email, newUser.getRole());
+                        return userRepository.save(newUser);
+                    });
+
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                    user,
+                    null,
+                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
+            );
+            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+            logger.info("Firebase authentication successful for email: {} with role: {}", email, user.getRole());
+        } catch (Exception e) {
+            logger.warn("Firebase Authentication failed for URI {}: {}", requestUri, e.getMessage());
+        }
+
         filterChain.doFilter(request, response);
+    }
+
+    // Determine role based on Firebase token claims or other logic
+    private Role determineRole(FirebaseToken decodedToken) {
+        // Example: Check custom claims in Firebase token for role
+        // Replace with your logic (e.g., query external service, check claims, etc.)
+        Object roleClaim = decodedToken.getClaims().get("role");
+        if (roleClaim != null && roleClaim.toString().equalsIgnoreCase("ADMIN")) {
+            return Role.ADMIN;
+        } else if (roleClaim != null && roleClaim.toString().equalsIgnoreCase("DRIVER")) {
+            return Role.DRIVER;
+        }
+        return Role.CUSTOMER; // Default role
     }
 }
