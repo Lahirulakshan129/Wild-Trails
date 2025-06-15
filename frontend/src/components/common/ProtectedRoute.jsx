@@ -10,7 +10,7 @@ export default function ProtectedRoute({ children, requiredRole }) {
     const decoded = jwtDecode(token); 
     const role = decoded.role;
 
-    if (role !== `ROLE_${requiredRole}`) {
+    if (role !== `${requiredRole}`) {
       return <Navigate to="/unauthorized" replace />;
     }
 

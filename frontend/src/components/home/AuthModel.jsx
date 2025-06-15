@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X } from "lucide-react";
+import { ChartNoAxesColumnDecreasing, X } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "./config/firebaseConfig";
@@ -81,7 +81,7 @@ export default function AuthModal({
         const res = await fetch(`${BASE_URL}/api/auth/lookup?email=${email}`);
         if (!res.ok) throw new Error("User not found.");
         const { role } = await res.json();
-  
+       
         if (role === "CUSTOMER") {
           // Firebase Login
           await signInWithEmailAndPassword(auth, email, password);
@@ -117,8 +117,8 @@ export default function AuthModal({
           localStorage.setItem("user", JSON.stringify(data));
           const decoded = jwtDecode(data.token);
   
-          if (decoded.role === "ROLE_ADMIN") navigate("/AdminDashboard");
-          else if (decoded.role === "ROLE_DRIVER") navigate("/DriverDashboard");
+          if (decoded.role === "ADMIN") navigate("/AdminDashboard");
+          else if (decoded.role === "DRIVER") navigate("/DriverDashboard");
         }
       } catch (err) {
         alert("Login failed: " + err.message);
