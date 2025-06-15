@@ -1,21 +1,22 @@
 package com.wildtrails.backend.entity;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "drivers")
-public class Driver {
+@Table(name = "customers")
+public class Customer {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id", nullable = false, unique = true)
     private User user;
-    private String licenseNumber;
-    private String vehicleType;
-    private String photoUrl;
-    private Integer yearsExperience;
-    private Boolean isAvailable;
 
+    private String photoUrl;
+    private String phoneNumber;
+    private String address;
+    private Integer loyaltyPoints;
+    
 }

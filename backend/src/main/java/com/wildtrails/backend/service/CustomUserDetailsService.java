@@ -3,6 +3,8 @@ package com.wildtrails.backend.service;
 import com.wildtrails.backend.entity.Role;
 import com.wildtrails.backend.entity.User;
 import com.wildtrails.backend.repository.UserRepository;
+import com.wildtrails.backend.security.CustomUserDetails;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,11 +12,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
 
 @Getter
 @Setter
@@ -31,13 +30,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
-
-        return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getPassword(),
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
-        );
+        return new CustomUserDetails(user);
     }
+    
 
     public User loadOrCreateCustomer(String email, String name, String uid) {
         return userRepository.findByEmail(email).orElseGet(() -> {
