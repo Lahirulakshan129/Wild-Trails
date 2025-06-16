@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import AddDriverForm from "../components/adminDashboard/AddDriverForm";
 
 export default function AdminDashboard() {
     const [admin, setAdmin] = useState(null);
@@ -48,6 +49,12 @@ export default function AdminDashboard() {
                     <h3 className="text-xl font-bold text-[#264653] mb-2">Reports</h3>
                     <p className="text-gray-600">Generate and view reports.</p>
                     {/* Add functionality for reports */}
+                </div>
+
+                {/* Temporary Driver Form Section */}
+                <div className="bg-white p-6 rounded-xl shadow-md">
+                    <h3 className="text-xl font-bold text-[#264653] mb-4">Add a Driver (Temporary)</h3>
+                    <AddDriverForm />
                 </div>
             </div>
 

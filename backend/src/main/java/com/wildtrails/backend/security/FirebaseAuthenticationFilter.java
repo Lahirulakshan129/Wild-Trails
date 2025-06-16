@@ -92,8 +92,6 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
 
     // Determine role based on Firebase token claims or other logic
     private Role determineRole(FirebaseToken decodedToken) {
-        // Example: Check custom claims in Firebase token for role
-        // Replace with your logic (e.g., query external service, check claims, etc.)
         Object roleClaim = decodedToken.getClaims().get("role");
         if (roleClaim != null && roleClaim.toString().equalsIgnoreCase("ADMIN")) {
             return Role.ADMIN;

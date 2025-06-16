@@ -34,7 +34,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
     
 
-    public User loadOrCreateCustomer(String email, String name, String uid) {
+    public User loadOrCreateCustomer(String email, String name, int uid) {
         return userRepository.findByEmail(email).orElseGet(() -> {
             User newUser = User.builder()
                     .email(email)
