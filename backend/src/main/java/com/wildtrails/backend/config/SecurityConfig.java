@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final CustomUserDetailsService userDetailsService;
+   // private final CustomUserDetailsService userDetailsService;
     private final FirebaseAuthenticationFilter firebaseAuthenticationFilter;
 
     @Bean
@@ -32,7 +32,6 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/firebase/**").permitAll()  // Firebase entrypoint
                 .requestMatchers("/api/auth/login", "/api/auth/lookup").permitAll()
-                .requestMatchers("/api/auth/register/driver", "/api/auth/register/admin").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/driver/**").hasRole("DRIVER")
                 .requestMatchers("/api/customer/**").hasRole("CUSTOMER")

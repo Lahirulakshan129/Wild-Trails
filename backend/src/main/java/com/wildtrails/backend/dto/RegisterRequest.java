@@ -8,6 +8,8 @@ public class RegisterRequest {
     private String email;
     private String password;
     private Role role;
+    private String vehicleType;
+    private int seatingCapacity;
 
     public String getName() {
         return name;
@@ -39,5 +41,20 @@ public class RegisterRequest {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+    public String getVehicleType() {
+        return vehicleType;
+    }
+
+    public void setVehicleType(String vehicleType) {
+        this.vehicleType = vehicleType;
+    }
+
+    public int getSeatingCapacity() {
+        return seatingCapacity;
+    }
+
+    public void setSeatingCapacity(int seatingCapacity) {
+        this.seatingCapacity = seatingCapacity;
     }
 }

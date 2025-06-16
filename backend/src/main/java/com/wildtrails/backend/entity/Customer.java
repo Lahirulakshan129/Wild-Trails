@@ -8,15 +8,15 @@ import lombok.Data;
 @Table(name = "customers")
 public class Customer {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id", nullable = false, unique = true)
     private User user;
 
-    private String photoUrl;
-    private String phoneNumber;
+    private String photo_url;
+    private String phone_number;
     private String address;
-    private Integer loyaltyPoints;
+    private Integer loyalty_points;
     
 }

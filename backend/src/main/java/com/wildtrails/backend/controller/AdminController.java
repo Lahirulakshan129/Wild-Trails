@@ -18,6 +18,7 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/register-driver")
     public ResponseEntity<?> registerDriver(@RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(authService.registerDriver(request));
-    }
+    authService.registerDriver(request); 
+    return ResponseEntity.ok("Driver registered successfully.");
+}
 }
