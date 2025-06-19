@@ -2,69 +2,69 @@ export default function ActivitiesSection() {
   const activities = [
     {
       id: 1,
-      image: '',
-      title: 'Udawalawe Park',
-      description: 'Spot exotic wildlife species in their natural habitat'
+      image: "src/assets/kudumbigala.JPG",
+      title: "Kudumbigala Rock",
     },
     {
       id: 2,
-      image: '',
-      title: 'Lagoon Boat Tour',
-      description: 'Experience the wilderness with premium comfort'
+      image: "src/assets/Lagoon_Boat_Tour.jpg",
+      title: "Lagoon Boat Tour",
     },
     {
       id: 3,
-      image: '',
-      title: 'Tuk Tuk to Arugam Bay',
-      description: 'Explore beautiful coastal areas'
+      image: "src/assets/Arugambay.webp",
+      title: "Surfing in Arugam Bay",
     },
     {
       id: 4,
-      image: '',
-      title: 'Cooking Class',
-      description: 'Learn to prepare authentic Sri Lankan cuisine'
-    }
+      image: "src/assets/cooking_class.webp",
+      title: "Cooking Class",
+    },
   ];
 
   return (
     <section id="activities" className="py-16 bg-white">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-8">
-          <h2 className="text-safari-charcoal font-serif text-3xl font-normal mb-2">Unforgettable Activities</h2>
-          <p className="text-safari-charcoal/80 max-w-3xl mx-auto text-sm">
-            The adventures doesn't stop with the safari alone.
+        {/* Section Title */}
+        <div className="text-center mb-12">
+          <h2 className="text-safari-charcoal font-caveat text-4xl font-normal mb-2">
+            Unforgettable Activities
+          </h2>
+          <p className="font-aref font-bold text-safari-charcoal/80 max-w-3xl mx-auto text-sm">
+            The adventure doesn't end with the safari!
           </p>
-          <p className="text-safari-charcoal/80 max-w-2xl mx-auto text-sm mt-2">
-            Make the most of your time in Sri Lankan region with unique cultural and adventure experiences.
-            From birdwatching and water tours, visits to sacred forest sites and trekking to local attractions.
+          <p className="font-aref text-safari-charcoal/80 max-w-2xl mx-auto text-sm mt-2">
+            Make the most of your time in the Kumana region with unique cultural
+            and adventure experiences. From ancient temples and scenic rock
+            climbs to serene boat rides and hands-on local cooking,
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {activities.map(activity => (
-            <div key={activity.id} className="bg-white rounded-lg overflow-hidden border border-gray-200">
-              <div className="relative h-36 overflow-hidden">
-                <img 
-                  src={activity.image} 
-                  alt={activity.title} 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              <div className="p-3 text-center">
-                <h3 className="font-serif text-base font-medium text-safari-charcoal mb-1">{activity.title}</h3>
-                <p className="text-safari-charcoal/80 text-xs mb-2">{activity.description}</p>
+        {/* Activity Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
+          {activities.map((activity) => (
+            <div key={activity.id} className="text-center">
+              <img
+                src={activity.image}
+                alt={activity.title}
+                className="w-64 h-80 object-cover rounded-[2rem] mx-auto shadow-md"
+              />
+              <div className="mt-4">
+                <div className="w-64 mx-auto bg-[#C6E3B3] text-safari-charcoal/80 text-sm font-aref px-4 py-2 rounded-full font-medium">
+                  {activity.title}
+                </div>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="text-center mt-8">
-          <a 
-            href="/#contact" 
-            className="bg-safari-green hover:bg-safari-light-green text-white px-6 py-2 rounded-full text-sm font-medium transition-colors inline-block"
+        {/* Button */}
+        <div className="text-center mt-10">
+          <a
+            href="/#contact"
+            className="font-aref bg-safari-green hover:bg-safari-light-green text-[#0D722A] px-6 py-2 rounded-full text-base font-medium transition-colors inline-block"
           >
-            Plan My Activities
+            Plan MY Holiday &gt;&gt;&gt;
           </a>
         </div>
       </div>
