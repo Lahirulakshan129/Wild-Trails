@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import Sidebar from "../components/User/Sidebar";
-import Header from "../components/User/Header";
-import BookingCard from "../components/User/BookingCard";
-import LoyaltyPointsCard from "../components/User/LoyaltyPointsCard";
-import ReviewsCard from "../components/User/ReviewCard";
-import MemoryAlbum from "../components/User/MemoryAlbum";
+import Sidebar from "../../components/User/Sidebar";
+import Header from "../../components/User/Header";
+import BookingCard from "../../components/User/BookingCard";
+import LoyaltyPointsCard from "../../components/User/LoyaltyPointsCard";
+import ReviewsCard from "../../components/User/ReviewCard";
+import MemoryAlbum from "../../components/User/MemoryAlbum";
 import {Link} from "react-router-dom";
 
 const Dashboard = () => {
