@@ -42,7 +42,6 @@ public class FirebaseAuthController {
                 user = existingUserOpt.get();
             }
 
-            // Return basic user info (DTO or entity — depending on security)
             return ResponseEntity.ok(user);
 
         } catch (FirebaseAuthException e) {

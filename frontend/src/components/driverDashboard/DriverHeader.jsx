@@ -37,7 +37,7 @@ export default function DriverHeader({ setActivePanel, user }) {
 
   return (
     <header className="bg-green-900 text-white px-6 py-4 flex justify-between items-center shadow-md sticky top-0 z-50">
-      <h1 className="text-xl font-bold tracking-wide">Kumana Driver Dashboard</h1>
+      <h1 className="text-xl font-bold tracking-wide">WildTrails Driver Dashboard</h1>
 
       {user && (
         <div className="flex items-center gap-4">
