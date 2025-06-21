@@ -1,6 +1,7 @@
 import { X, User, Car, Star, MapPin, Clock } from "lucide-react";
 
 export default function DriverProfileSidebar({ isOpen, onClose, user }) {
+
   return (
     <>
       {/* Backdrop */}

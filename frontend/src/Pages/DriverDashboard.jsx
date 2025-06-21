@@ -24,6 +24,7 @@ export default function DriverDashboard() {
       try {
         const decoded = jwtDecode(token);
         setUser({
+          id: decoded.id,
           name: decoded.name,
           email: decoded.sub,
           role: decoded.role,

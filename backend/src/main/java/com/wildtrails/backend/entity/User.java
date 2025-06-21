@@ -12,7 +12,7 @@ import lombok.*;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private int id;
 
     @Column(nullable = false)
     private String name;
@@ -26,4 +26,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Driver driver;
 }

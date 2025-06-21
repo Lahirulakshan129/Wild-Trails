@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -28,8 +30,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
+            HttpServletResponse response,
+            FilterChain filterChain)
             throws ServletException, IOException {
 
         String requestUri = request.getRequestURI();
@@ -50,6 +52,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String jwtToken = authHeader.substring(7);
+        String email = null;
+            try {
+                email = jwtService.extractUsername(jwtToken);
+                logger.info("Extracted email: {}", email);
+            } catch (Exception e) {
+                System.out.println(email);
+                logger.error("Error extracting email from token: {}", e.toString(), e);
+            }
+
         try {
             // Check if token is a Firebase token
             if (isFirebaseToken(jwtToken)) {
@@ -59,20 +70,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             logger.debug("Processing JWT token for URI: {}", requestUri);
-            String email = jwtService.extractUsername(jwtToken);
 
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
                 if (jwtService.isTokenValid(jwtToken, email)) {
+                    String role = jwtService.extractClaim(jwtToken, claims -> claims.get("role", String.class));
+                    List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
+
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
-                            userDetails.getAuthorities()
-                    );
+                            authorities);
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
-                    logger.info("JWT authentication successful for email: {} with authorities: {}", 
-                                email, userDetails.getAuthorities());
+                    logger.info("JWT authentication successful for email: {} with authorities: {}",
+                            email, userDetails.getAuthorities());
                 } else {
                     logger.warn("Invalid JWT token for URI: {}", requestUri);
                 }

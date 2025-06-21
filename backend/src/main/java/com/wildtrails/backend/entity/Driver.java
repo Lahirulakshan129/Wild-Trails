@@ -6,16 +6,18 @@ import lombok.Data;
 @Entity
 @Table(name = "drivers")
 public class Driver {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id", nullable = false, unique = true)
+    @Id
+    private int id; 
+
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "id")
     private User user;
-    private String licenseNumber;
-    private String vehicleType;
-    private String photoUrl;
-    private Integer yearsExperience;
-    private Boolean isAvailable;
 
+    private String vehicle_type;
+    private int seating_capacity;
+    private boolean is_available;
+
+   
 }
