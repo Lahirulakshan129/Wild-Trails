@@ -6,25 +6,23 @@ export default function ResponsibleTourismSection() {
           <h2 className="font-aref font-bold text-xl text-black mb-3">
             Responsible Tourism
           </h2>
+          <p className="font-aref text-safari-charcoal/80 text-sm max-w-2xl mx-auto">
+            “Travel Light. Leave a Legacy”
+          </p>
         </div>
 
-        <div className="max-w-4xl mx-auto">
-        <p className="font-aref text-center text-safari-charcoal/80 max-w-2xl mx-auto text-sm">“Travel Light. Leave a Legacy”</p>
-          <p className="text-safari-charcoal text-sm leading-relaxed mb-4">
-            At Wild Trails, we firmly believe ecotourism should protect from nature — not take from it. 
-            That's why we follow strict environmental practices in all our operations. Our safari vehicles use modern, low-emission engines, 
-            and we adhere to designated trails to minimize habitat disruption. We actively support local conservation efforts 
-            by donating a portion of our profits to wildlife protection organizations.
+        <div className="max-w-4xl mx-auto space-y-6">
+          <p className="font-aref text-safari-charcoal text-sm leading-relaxed">
+            At Wild Trails, we believe every adventure should protect what makes it special. 
+            That’s why we follow eco-friendly practices, limit vehicle impact, and support local 
+            communities through fair employment and cultural respect. We collaborate with conservation 
+            groups, educate visitors on wildlife ethics, and reinvest a portion of our proceeds into 
+            local sustainability projects.
           </p>
 
-          <p className="text-safari-charcoal text-sm leading-relaxed mb-4">
-            Our commitment extends beyond the environment to the local communities. We exclusively hire local guides and staff, 
-            source our supplies from local businesses, and integrate cultural experiences that benefit traditional villages. 
-            This approach ensures that tourism dollars flow directly into the communities that steward these precious ecosystems.
-          </p>
-
-          <blockquote className="border-l-4 border-safari-green pl-4 italic text-safari-charcoal text-lg my-6 text-center mx-auto max-w-2xl">
-            "We don't just explore nature — it's nature we protect!"
+          <blockquote className="border-l-4 border-safari-green pl-4 italic font-aref font-bold 
+          text-safari-charcoal text-base text-center mx-auto max-w-xl">
+            “Wild isn’t just where we go — it’s what we protect”
           </blockquote>
         </div>
       </div>
