@@ -27,7 +27,7 @@ export default function AboutSection() {
             <div className="md:w-1/3 mb-8 md:mb-0">
               <img 
                 src="src/assets/rushan.png" 
-                alt="Kumara Bandara" 
+                alt="Rushan Thilanka" 
                 className="w-48 h-48 object-cover rounded-full mx-auto border-4 border-safari-green"
               />
             </div>
