@@ -3,7 +3,7 @@ import { PencilIcon, TrashIcon } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 
-// ✅ Mock Review Data (no TS types)
+// Mock Review Data (no TS types)
 const MOCK_REVIEWS = [
   {
     id: "r1",
@@ -57,7 +57,7 @@ const MOCK_REVIEWS = [
   },
 ];
 
-// ✅ Star Rating Subcomponent
+// Star Rating Subcomponent
 const StarRating = ({ rating }) => {
   return (
     <div className="flex">
@@ -75,8 +75,7 @@ const StarRating = ({ rating }) => {
     </div>
   );
 };
-
-// ✅ Reviews Table Component (plain JS)
+// Reviews Table Component (plain JS)
 const ReviewsTable = () => {
   const [reviews, setReviews] = useState(MOCK_REVIEWS);
   const [editingId, setEditingId] = useState(null);
