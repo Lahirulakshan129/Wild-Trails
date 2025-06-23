@@ -19,6 +19,7 @@ export default function AdminDashboard() {
             </header>
 
             {/* Main Content */}
+
             <div className="flex-1 container mx-auto px-4 py-6 space-y-6">
                 {/* Welcome Section */}
                 <div className="bg-white p-6 rounded-xl shadow-md">
@@ -26,7 +27,7 @@ export default function AdminDashboard() {
                         Welcome, {admin?.name || "Admin"}!
                     </h2>
                     <p className="text-gray-600">
-                        Manage your platform efficiently from here.
+                        Manage your platform efficiently from this.
                     </p>
                 </div>
 
