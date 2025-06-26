@@ -2,13 +2,13 @@ package com.wildtrails.backend.config;
 
 import com.wildtrails.backend.security.FirebaseAuthenticationFilter;
 import com.wildtrails.backend.security.JwtAuthenticationFilter;
-import com.wildtrails.backend.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,10 +18,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @RequiredArgsConstructor
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-   // private final CustomUserDetailsService userDetailsService;
     private final FirebaseAuthenticationFilter firebaseAuthenticationFilter;
 
     @Bean
@@ -30,17 +30,19 @@ public class SecurityConfig {
             .cors(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/firebase/**").permitAll()  // Firebase entrypoint
+                .requestMatchers("/api/auth/firebase/**").permitAll()
                 .requestMatchers("/api/auth/login", "/api/auth/lookup").permitAll()
+                .requestMatchers("/error").permitAll() 
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/driver/**").hasRole("DRIVER")
                 .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
+                .requestMatchers("/api/sightings").hasRole("DRIVER")
+                .requestMatchers("/api/sightings/**").hasRole("DRIVER")
                 .anyRequest().authenticated()
             )
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(firebaseAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 

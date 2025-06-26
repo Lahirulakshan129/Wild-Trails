@@ -6,4 +6,7 @@ import com.wildtrails.backend.entity.User;
 
 public interface DriverRepository extends JpaRepository<Driver, Long> {
     Optional<Driver> findByUser(User user);
+    
+    Optional<Driver> findByUser_Email(String email);
+
 }
