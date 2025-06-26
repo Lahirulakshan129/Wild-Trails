@@ -5,13 +5,13 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+} from "@/components/ui/home-ui/card";
+import { Button } from "@/components/ui/home-ui/button";
+import { Label } from "@/components/ui/home-ui/label";
 import {
   RadioGroup,
   RadioGroupItem,
-} from "@/components/ui/radio-group";
+} from "@/components/ui/home-ui/radio-group";
 import { Star } from "lucide-react";
 
 export default function ReviewsPage() {
