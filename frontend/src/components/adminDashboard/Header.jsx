@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { BellIcon, CalendarIcon, UserIcon } from "lucide-react";
-//import { Button } from "../ui/Button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar";
-import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/adminDashboard-ui/Button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/adminDashboard-ui/Avatar";
+import { Badge } from "@/components/ui/adminDashboard-ui/Badge";
 
 const Header = ({ title, breadcrumbs }) => {
   const [notifications, setNotifications] = useState(3);
 
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-3">
+    <header className="bg-gray-500 border-b border-gray-200 px-6 py-3">
       <div className="flex justify-between items-center">
         <div>
           <div className="flex items-center space-x-2 text-safari-sand mb-1">

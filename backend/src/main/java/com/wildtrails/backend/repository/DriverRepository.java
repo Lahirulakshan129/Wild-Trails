@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.wildtrails.backend.entity.Driver; 
 import com.wildtrails.backend.entity.User;
 
-public interface DriverRepository extends JpaRepository<Driver, Long> {
+public interface DriverRepository extends JpaRepository<Driver, Integer >{
     Optional<Driver> findByUser(User user);
     
     Optional<Driver> findByUser_Email(String email);

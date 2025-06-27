@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { PencilIcon, TrashIcon } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/adminDashboard-ui/Button";
+import { Badge } from "@/components/ui/adminDashboard-ui/Badge";
 
 // Mock data without TypeScript typing
 const MOCK_REVIEWS = [
