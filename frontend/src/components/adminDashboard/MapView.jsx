@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/adminDashboard-ui/Button";
+import { Badge } from "@/components/ui/adminDashboard-ui/Badge";
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/Dialog";
+} from "@/components/ui/adminDashboard-ui/Dialog";
 
 // Sightings and Alerts Mock Data (plain JS objects)
 const MOCK_SIGHTINGS = [

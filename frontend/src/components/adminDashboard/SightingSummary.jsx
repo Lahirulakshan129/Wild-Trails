@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { Calendar } from "@/components/ui/Calendar";
+import { Calendar } from "@/components/ui/adminDashboard-ui/Calendar";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+} from "@/components/ui/adminDashboard-ui/Card";
+import { Badge } from "@/components/ui/adminDashboard-ui/Badge";
+import { Button } from "@/components/ui/adminDashboard-ui/Button";
 import {
   CalendarIcon,
   ChevronDownIcon,
@@ -18,7 +18,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/Popover";
+} from "@/components/ui/adminDashboard-ui/Popover";
 
 // Mock Data (remove TypeScript types)
 const MOCK_DATA = [

@@ -40,8 +40,8 @@ public class CustomUserDetailsService implements UserDetailsService {
                     .email(email)
                     .name(name)
                     .id(uid)
-                    .role(Role.CUSTOMER) // Assuming Role is an enum with CUSTOMER as one of the values
-                    .password("defaultPassword") // Replace with a secure default or generated password
+                    .role(Role.CUSTOMER) 
+                    .password("defaultPassword") 
                     .build();
             return userRepository.save(newUser);
         });

@@ -58,13 +58,12 @@ export default function DriverDashboard() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-0">
-      <div className="w-full h-screen bg-[#F8F9FA] relative">
+      <div className="w-full h-screen bg-[#F8F9FA] relative ">
         <div className="absolute inset-0 flex flex-col">
-          {/* Header */}
+        
           <Header setActivePanel={setActivePanel} user={user} />
 
-          {/* Body content */}
-          <div className="flex-1 container mx-auto p-4 overflow-hidden scrollbar-hide">
+          <div className="flex-1 container mx-auto p-4 overflow-hidden ">
             <div className="h-full w-full flex flex-col lg:flex-row gap-4">
               {/* Map Section */}
               <Mapbox

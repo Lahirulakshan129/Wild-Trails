@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { PencilIcon, TrashIcon } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
+import { Button } from "../ui/adminDashboard-ui/Button";
+import { Badge } from "../ui/adminDashboard-ui/Badge";
 
 // Mock Review Data (no TS types)
 const MOCK_REVIEWS = [

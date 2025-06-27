@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Label } from "@/components/ui/Label"; // Adjusted import for Label
-import { Switch } from "@/components/ui/Switch"; // Adjusted import for Switch
-import { Input } from "@/components/ui/Input"; // Adjusted import for Input
-import { Button } from "@/components/ui/Button"; // Adjusted import for Button
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"; // Adjusted import for Card
-import { Slider } from "@/components/ui/Slider"; // Adjusted import for Slider
-import { toast } from "@/hooks/use-toast"; // Adjusted import for toast
+import { Label } from "@/components/ui/adminDashboard-ui/Label"; // Adjusted import for Label
+import { Switch } from "@/components/ui/adminDashboard-ui/Switch"; // Adjusted import for Switch
+import { Input } from "@/components/ui/adminDashboard-ui/Input"; // Adjusted import for Input
+import { Button } from "@/components/ui/adminDashboard-ui/Button"; // Adjusted import for Button
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/adminDashboard-ui/Card"; // Adjusted import for Card
+import { Slider } from "@/components/ui/adminDashboard-ui/Slider"; // Adjusted import for Slider
+import { Toast } from "@/components/ui/adminDashboard-ui/toast"; // Adjusted import for toast
 
 const LoyaltyControl = () => {
   const [loyaltyEnabled, setLoyaltyEnabled] = useState(true);
@@ -25,7 +25,7 @@ const LoyaltyControl = () => {
       tierThresholds,
     });
 
-    toast({
+    Toast({
       title: "Settings Saved",
       description: "Loyalty program settings have been updated successfully.",
     });

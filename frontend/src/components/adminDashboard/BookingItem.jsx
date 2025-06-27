@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { AlertCircleIcon, CheckCircleIcon, ClockIcon, UserIcon, XCircleIcon } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
-import { Progress } from "@/components/ui/Progress";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/Dialog";
-import { Textarea } from "@/components/ui/Textarea";
+import { Button } from "@/components/ui/home-ui/Button";
+import { Badge } from "@/components/ui/home-ui/Badge";
+import { Progress } from "@/components/ui/home-ui/Progress";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/home-ui/Dialog";
+import { Textarea } from "@/components/ui/home-ui/Textarea";
 
 // Mapping badge by status (JS only, removed BookingStatus type)
 const getStatusBadge = (status) => {

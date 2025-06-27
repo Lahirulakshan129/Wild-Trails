@@ -30,14 +30,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain)
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
             throws ServletException, IOException {
 
         String requestUri = request.getRequestURI();
         logger.info("JwtAuthenticationFilter processing URI: {}", requestUri);
 
-        // Skip Firebase endpoints
         if (requestUri.startsWith("/api/auth/firebase/") || requestUri.equals("/api/auth/firebase")) {
             logger.info("Skipping JwtAuthenticationFilter for Firebase endpoint: {}", requestUri);
             filterChain.doFilter(request, response);
@@ -45,6 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String authHeader = request.getHeader("Authorization");
+        logger.info("Received Authorization Header: {}", authHeader);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             logger.debug("No valid Bearer token found for URI: {}", requestUri);
             filterChain.doFilter(request, response);
@@ -53,46 +53,38 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String jwtToken = authHeader.substring(7);
         String email = null;
-            try {
-                email = jwtService.extractUsername(jwtToken);
-                logger.info("Extracted email: {}", email);
-            } catch (Exception e) {
-                System.out.println(email);
-                logger.error("Error extracting email from token: {}", e.toString(), e);
-            }
-
         try {
-            // Check if token is a Firebase token
-            if (isFirebaseToken(jwtToken)) {
-                logger.debug("Firebase token detected for URI: {}, skipping JWT processing", requestUri);
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            logger.debug("Processing JWT token for URI: {}", requestUri);
-
-            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-                if (jwtService.isTokenValid(jwtToken, email)) {
-                    String role = jwtService.extractClaim(jwtToken, claims -> claims.get("role", String.class));
-                    List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
-
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            authorities);
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                    logger.info("JWT authentication successful for email: {} with authorities: {}",
-                            email, userDetails.getAuthorities());
-                } else {
-                    logger.warn("Invalid JWT token for URI: {}", requestUri);
-                }
-            } else {
-                logger.debug("No email extracted or authentication already set for URI: {}", requestUri);
-            }
+            email = jwtService.extractUsername(jwtToken);
+            logger.info("Extracted email: {}", email);
         } catch (Exception e) {
-            logger.warn("JWT Authentication failed for URI {}: {}", requestUri, e.getMessage());
+            logger.error("Error extracting email from token: {}", e.toString(), e);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if (isFirebaseToken(jwtToken)) {
+            logger.debug("Firebase token detected for URI: {}, skipping JWT processing", requestUri);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+            if (jwtService.isTokenValid(jwtToken, email)) {
+                String role = jwtService.extractClaim(jwtToken, claims -> claims.get("role", String.class));
+                logger.info("Extracted role from JWT: {}", role);
+                logger.info("UserDetails authorities: {}", userDetails.getAuthorities());
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities()
+                );
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                logger.info("JWT authentication successful for email: {} with authorities: {}", email, authentication.getAuthorities());
+            } else {
+                logger.warn("Invalid JWT token for URI: {}", requestUri);
+            }
+        } else {
+            logger.debug("No email extracted or authentication already set for URI: {}", requestUri);
         }
 
         filterChain.doFilter(request, response);
