@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import { Card } from "../ui/driverDashboard-ui/card";
 import PropTypes from "prop-types";
 import SightingForm from "./AnimalSightingForm";
+import { PawPrint } from "lucide-react";
 
 // Marker pool for recycling markers
 const MARKER_POOL_SIZE = 20;
@@ -18,6 +19,7 @@ const MapSection = ({ selectedLocation, setSelectedLocation }) => {
     animalType: 'all',
     timeRange: '10min'
   });
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Get marker from pool or create new one
   const getMarker = () => {
@@ -224,13 +226,77 @@ const MapSection = ({ selectedLocation, setSelectedLocation }) => {
         </div>
       )}
 
-      <div className="absolute top-4 right-4 flex flex-col space-y-2">
-        <div className="bg-white p-2 rounded shadow">
-          <label className="block text-sm font-medium mb-1">Animal Type</label>
-          <select 
-            className="w-full p-1 border rounded"
-            value={filters.animalType}
-            onChange={(e) => setFilters({...filters, animalType: e.target.value})}
+      {/* Toggle Button for Mobile */}
+      <button
+        className="absolute top-4 right-4 sm:hidden bg-green-600 text-white p-2 rounded-full z-50"
+        onClick={() => setIsFilterOpen(!isFilterOpen)}
+      >
+        <PawPrint className="h-5 w-5" />
+      </button>
+
+      {/* Bottom Sheet for Mobile */}
+    {/* Mobile Filter Button */}
+<button
+  className="sm:hidden absolute top-4 right-4 bg-green-600 text-white p-3 rounded-full z-50 shadow-lg"
+  onClick={() => setIsFilterOpen(!isFilterOpen)}
+>
+  <PawPrint className="h-5 w-5" />
+</button>
+
+{/* Mobile Filter Popover */}
+{isFilterOpen && (
+  <div 
+    className="sm:hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+    onClick={() => setIsFilterOpen(false)} // Close when clicking outside
+  >
+    <div 
+      className="bg-white rounded-xl p-4 w-full max-w-xs"
+      onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
+    >
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold text-green-800">Filter Animals</h3>
+        <button 
+          onClick={() => setIsFilterOpen(false)}
+          className="text-gray-500 hover:text-gray-700 text-xl"
+        >
+          &times;
+        </button>
+      </div>
+      <div className="relative"> {/* Wrapper for select */}
+        <select
+          className="w-full p-3 border border-green-300 rounded-lg text-green-900 appearance-none"
+          value={filters.animalType}
+          onChange={(e) => {
+            setFilters({ ...filters, animalType: e.target.value });
+            setIsFilterOpen(false);
+          }}
+        >
+          <option value="all">All Animals</option>
+          <option value="elephant">Elephant</option>
+          <option value="leopard">Leopard</option>
+          <option value="bear">Bear</option>
+        </select>
+        {/* Custom dropdown arrow */}
+        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+          <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+      {/* Desktop Filter */}
+      <div className="hidden sm:block absolute top-4 right-4 z-50 w-60">
+        <div className="bg-gradient-to-br from-green-100 to-green-50 border border-green-200 p-4 rounded-xl shadow-lg">
+          <label className="block text-sm font-semibold text-green-800 mb-2 flex items-center gap-2">
+            <PawPrint className="h-4 w-4 text-green-700" />
+            Filter by Animal
+          </label>
+          <select
+            className="w-full p-2 bg-white border border-green-300 rounded-md text-sm text-green-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500"
+            value={filters.animalType}  
+            onChange={(e) => setFilters({ ...filters, animalType: e.target.value })}
           >
             <option value="all">All Animals</option>
             <option value="elephant">Elephant</option>
@@ -238,13 +304,6 @@ const MapSection = ({ selectedLocation, setSelectedLocation }) => {
             <option value="bear">Bear</option>
           </select>
         </div>
-
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
-          onClick={() => setShowForm(true)}
-        >
-          Report Sighting
-        </button>
       </div>
 
       {showForm && (

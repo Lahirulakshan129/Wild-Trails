@@ -37,28 +37,33 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
         String requestUri = request.getRequestURI();
         logger.info("FirebaseAuthenticationFilter processing URI: {}", requestUri);
 
+        // Normalize URI for consistent comparison
+        String normalizedUri = requestUri != null ? requestUri.trim() : "";
+        logger.debug("Normalized URI: {}", normalizedUri);
+
         // Only process Firebase endpoints
-        if (!requestUri.startsWith("/api/auth/firebase/") && !requestUri.equals("/api/auth/firebase")) {
-            logger.debug("Skipping FirebaseAuthenticationFilter for non-Firebase URI: {}", requestUri);
+        if (!normalizedUri.startsWith("/api/auth/firebase/") && !normalizedUri.equals("/api/auth/firebase")) {
+            logger.info("Skipping FirebaseAuthenticationFilter for non-Firebase URI: {}", normalizedUri); // Changed to INFO
             filterChain.doFilter(request, response);
             return;
         }
 
         String authHeader = request.getHeader("Authorization");
+        logger.debug("Authorization header: {}", authHeader);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            logger.debug("No valid Bearer token found for Firebase URI: {}", requestUri);
+            logger.debug("No valid Bearer token found for Firebase URI: {}", normalizedUri);
             filterChain.doFilter(request, response);
             return;
         }
 
         String idToken = authHeader.substring(7);
         try {
-            logger.debug("Processing Firebase token for URI: {}", requestUri);
+            logger.debug("Processing Firebase token for URI: {}", normalizedUri);
             FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
             String email = decodedToken.getEmail();
 
             if (email == null || email.isEmpty()) {
-                logger.warn("No email found in Firebase token for URI: {}", requestUri);
+                logger.warn("No email found in Firebase token for URI: {}", normalizedUri);
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -68,8 +73,7 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
                         User newUser = new User();
                         newUser.setEmail(email);
                         newUser.setName(decodedToken.getName() != null ? decodedToken.getName() : "Firebase User");
-                        newUser.setPassword("FIREBASE_AUTH"); // Placeholder, not used
-                        // Default to CUSTOMER, but allow dynamic role assignment if needed
+                        newUser.setPassword("FIREBASE_AUTH");
                         newUser.setRole(determineRole(decodedToken));
                         logger.info("Creating new user for email: {} with role: {}", email, newUser.getRole());
                         return userRepository.save(newUser);
@@ -84,13 +88,12 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authToken);
             logger.info("Firebase authentication successful for email: {} with role: {}", email, user.getRole());
         } catch (Exception e) {
-            logger.warn("Firebase Authentication failed for URI {}: {}", requestUri, e.getMessage());
+            logger.warn("Firebase Authentication failed for URI {}: {}", normalizedUri, e.getMessage());
         }
 
         filterChain.doFilter(request, response);
     }
 
-    // Determine role based on Firebase token claims or other logic
     private Role determineRole(FirebaseToken decodedToken) {
         Object roleClaim = decodedToken.getClaims().get("role");
         if (roleClaim != null && roleClaim.toString().equalsIgnoreCase("ADMIN")) {
@@ -98,6 +101,6 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
         } else if (roleClaim != null && roleClaim.toString().equalsIgnoreCase("DRIVER")) {
             return Role.DRIVER;
         }
-        return Role.CUSTOMER; // Default role
+        return Role.CUSTOMER;
     }
 }

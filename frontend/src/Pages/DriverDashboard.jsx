@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast, Toaster } from "react-hot-toast";
 import { jwtDecode } from "jwt-decode";
 import Header from "../components/driverDashboard/DriverHeader";
 import Footer from "../components/home/Footer";
@@ -8,15 +9,66 @@ import Calender from "../components/driverDashboard/DriverBookingCalendar";
 import Sightingform from "../components/driverDashboard/AnimalSightingForm";
 import DriverProfileSidebar from "../components/driverDashboard/DriverProfileSidebar";
 import DriverSettingsSidebar from "../components/driverDashboard/DriverSettingsSidebar";
+import SOSButton from "../components/driverDashboard/SOSButton";
+import MonthlyBookingStats from "../components/driverDashboard/MonthlyBookingStats";
 
 export default function DriverDashboard() {
   const [view, setView] = useState("list");
-  const [user, setUser] = useState(null); // Initialize user state
+  const [user, setUser] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState({
     lat: 6.48553,
     lng: 81.68975,
   });
-  const [activePanel, setActivePanel] = useState(null); // State to manage active sidebar panel); 
+  const [activePanel, setActivePanel] = useState(null);
+  const [isSendingSOS, setIsSendingSOS] = useState(false);
+  const dummyBookings = [
+    {
+      id: 1,
+      date: '2025-06-01',
+      timeSlot: 'morning',
+      tourType: 'Normal Safari',
+      status: 'accepted',
+      clientName: 'John Safari',
+      vehicle: 'Toyota Land Cruiser'
+    },
+    {
+      id: 2,
+      date: '2025-06-01',
+      timeSlot: 'evening',
+      tourType: 'Bird Watching',
+      status: 'pending',
+      clientName: 'Sarah Bird',
+      vehicle: 'Land Rover Defender'
+    },
+    {
+      id: 3,
+      date: '2025-06-03',
+      timeSlot: 'full',
+      tourType: 'Normal Safari',
+      status: 'rejected',
+      clientName: 'Mike Explorer',
+      vehicle: 'Toyota Hilux'
+    },
+    {
+      id: 4,
+      date: '2025-06-15',
+      timeSlot: 'morning',
+      tourType: 'Photography Tour',
+      status: 'accepted',
+      clientName: 'Lisa Photographer',
+      vehicle: 'Toyota Land Cruiser'
+    },
+    {
+      id: 5,
+      date: '2025-06-20',
+      timeSlot: 'evening',
+      tourType: 'Family Safari',
+      status: 'pending',
+      clientName: 'The Wilson Family',
+      vehicle: 'Land Rover Defender'
+    }
+  ];
+  
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -41,30 +93,67 @@ export default function DriverDashboard() {
       animalName: "Elephant",
       dateTime: "2025-05-25T10:30:00",
       location: { lat: 6.4853, lng: 81.6853 },
+      description: "Family of 5 elephants near the watering hole",
     },
     {
       id: "2",
       animalName: "Leopard",
       dateTime: "2025-05-25T09:15:00",
       location: { lat: 6.4803, lng: 81.6793 },
+      description: "Spotted on a tree branch",
     },
     {
       id: "3",
       animalName: "Crocodile",
       dateTime: "2025-05-25T08:30:00",
       location: { lat: 6.4873, lng: 81.6923 },
+      description: "Large crocodile sunbathing on river bank",
     },
   ]);
 
+  const handleSendSOS = async (location) => {
+    setIsSendingSOS(true);
+    try {
+      const position = await new Promise((resolve, reject) =>
+        navigator.geolocation.getCurrentPosition(resolve, reject)
+      );
+
+      const token = localStorage.getItem("token");
+
+      const response = await fetch("http://localhost:8080/api/driver/sos", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          lat: location.lat,
+          lng: location.lng,
+        }),
+      });
+      if (response.ok) {
+        toast.success("SOS alert sent successfully! Rangers will contact you soon.");
+        
+      }
+
+      if (!response.ok) {
+        throw new Error("SOS alert failed");
+      }
+    } catch (error) {
+      console.error("Error sending SOS:", error);
+      toast.error("Failed to send SOS alert. Please try again.");
+    } finally {
+      setIsSendingSOS(false);
+    }
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-0">
+    <main className="flex min-h-screen flex-col items-center justify-between p-0 relative">
       <div className="w-full h-screen bg-[#F8F9FA] relative">
         <div className="absolute inset-0 flex flex-col">
-          {/* Header */}
           <Header setActivePanel={setActivePanel} user={user} />
 
-          {/* Body content */}
-          <div className="flex-1 container mx-auto p-4 overflow-hidden scrollbar-hide">
+          <div className="flex-1 container mx-auto p-4 overflow-hidden">
             <div className="h-full w-full flex flex-col lg:flex-row gap-4">
               {/* Map Section */}
               <Mapbox
@@ -72,36 +161,21 @@ export default function DriverDashboard() {
                 setSelectedLocation={setSelectedLocation}
                 sightings={sightings}
               />
+
               {/* Sidebar Section */}
               <div className="w-full lg:w-1/3 h-full flex flex-col space-y-4 overflow-auto scrollbar-hide">
                 {/* Animal Sighting Form */}
-                <Sightingform />
+                <Sightingform
+                  onNewSighting={(newSighting) =>
+                    setSightings((prev) => [newSighting, ...prev])
+                  }
+                />
+
                 {/* SOS Button */}
-                <div className="bg-white rounded-lg shadow-md p-4">
-                  <h2 className="text-xl font-serif font-semibold text-[#264653] mb-3">
-                    Emergency Assistance
-                  </h2>
-                  <button className="w-full py-3 bg-[#E76F51] hover:bg-[#E76F51]/90 text-white font-bold rounded-md shadow-lg flex items-center justify-center space-x-2">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="8" x2="12" y2="12"></line>
-                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                    <span>SEND SOS</span>
-                  </button>
-                  <p className="text-xs text-gray-500 mt-2">
-                    For emergency situations only. Sends your current location to park rangers.
-                  </p>
-                </div>
+                <SOSButton onSOS={handleSendSOS} isSending={isSendingSOS} />
 
                 {/* Recent Sightings */}
-                <div className="bg-white rounded-lg shadow-md p-4">
+                {/* <div className="bg-white rounded-lg shadow-md p-4">
                   <h2 className="text-xl font-serif font-semibold text-[#264653] mb-4">
                     Recent Sightings
                   </h2>
@@ -109,39 +183,42 @@ export default function DriverDashboard() {
                     {sightings.map((sighting) => (
                       <div
                         key={sighting.id}
-                        className="p-3 rounded-lg border hover:bg-gray-50"
+                        className={`p-3 rounded-lg border hover:bg-gray-50 ${
+                          sighting.animalName === "EMERGENCY" ? "bg-red-50 border-red-200" : ""
+                        }`}
                       >
                         <div className="flex">
                           <div className="text-3xl mr-3">
-                            {sighting.animalName === "Elephant"
-                              ? "🐘"
-                              : sighting.animalName === "Leopard"
-                              ? "🐆"
-                              : "🐊"}
+                            {sighting.animalName === "Elephant" ? "🐘" :
+                             sighting.animalName === "Leopard" ? "🐆" :
+                             sighting.animalName === "Crocodile" ? "🐊" :
+                             sighting.animalName === "EMERGENCY" ? "🆘" : "🐾"}
                           </div>
-                          <div>
-                            <h3 className="font-medium text-[#264653]">
+                          <div className="flex-1">
+                            <h3 className={`font-medium ${
+                              sighting.animalName === "EMERGENCY" 
+                                ? "text-red-600" 
+                                : "text-[#264653]"
+                            }`}>
                               {sighting.animalName}
                             </h3>
                             <p className="text-sm text-gray-500">
                               {new Date(sighting.dateTime).toLocaleString()}
                             </p>
                             <p className="text-xs text-gray-400">
-                              {sighting.location.lat}, {sighting.location.lng}
+                              {sighting.location.lat.toFixed(5)}, {sighting.location.lng.toFixed(5)}
                             </p>
                             <p className="text-sm text-gray-600 mt-1">
-                              {sighting.animalName === "Elephant"
-                                ? "Family of 5 elephants near the watering hole"
-                                : sighting.animalName === "Leopard"
-                                ? "Spotted on a tree branch"
-                                : "Large crocodile sunbathing on river bank"}
+                              {sighting.description}
                             </p>
                           </div>
                         </div>
                       </div>
                     ))}
                   </div>
-                </div>
+                </div> */}
+
+                {/* Booking Dashboard */}
                 <div>
                   <Booking />
                 </div>
@@ -151,22 +228,25 @@ export default function DriverDashboard() {
         </div>
       </div>
 
-      <div className="w-screen h-screen flex flex-col bg-white">
-        <div className="flex justify-end p-4">
-          <button
-            onClick={() => setView(view === "list" ? "calendar" : "list")}
-            className="bg-blue-600 text-white px-4 py-2 rounded-xl"
-          >
-            {view === "list" ? "Calendar View" : "List View"}
-          </button>
+      {/* Calendar/List View Section */}
+      <div className="w-screen min-h-screen flex flex-col bg-gray-50">
+  <div className="flex-1 overflow-auto scrollbar-hide px-4 lg:px-12 py-4">
+    <div className="max-w-7xl mx-auto w-full">
+      {/* Calendar + Stats side-by-side */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <Calender view={view} />
         </div>
-        <div className="flex-1 overflow-auto scrollbar-hide">
-          {view === "calendar" ? <Calender /> : <Calender />}
+        <div>
+          <MonthlyBookingStats bookings={dummyBookings} />
         </div>
       </div>
+    </div>
+  </div>
+</div>
 
-      {/* Footer */}  
-      <Footer />
+
+      {/* Footer */}
 
       {/* Sidebar Components */}
       {activePanel === "profile" && (

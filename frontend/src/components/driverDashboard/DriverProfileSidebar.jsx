@@ -1,7 +1,6 @@
 import { X, User, Car, Star, MapPin, Clock } from "lucide-react";
 
 export default function DriverProfileSidebar({ isOpen, onClose, user }) {
-
   return (
     <>
       {/* Backdrop */}
@@ -81,33 +80,36 @@ export default function DriverProfileSidebar({ isOpen, onClose, user }) {
             </div>
           </div>
 
-          {/* Vehicle Types */}
+          {/* Vehicle Info */}
           <div>
             <h3 className="font-semibold text-green-900 mb-3 flex items-center gap-2">
-              <Car className="h-5 w-5" /> Vehicle Types
+              <Car className="h-5 w-5" /> Vehicle Info
             </h3>
-            <ul className="list-disc list-inside text-sm space-y-1">
-              <li>4x4 Jeep – 6 Seater</li>
-              <li>Open-top Safari Jeep – 8 Seater</li>
-            </ul>
+            {user?.vehicleType ? (
+              <p className="text-sm text-gray-700">
+                {user.vehicleType} – {user.seatingCapacity || "N/A"} Seater
+              </p>
+            ) : (
+              <p className="text-sm text-gray-500">No vehicle details available</p>
+            )}
           </div>
 
-          {/* Recent Activity */}
-          <div>
-            <h3 className="font-semibold text-green-900 mb-3 flex items-center gap-2">
-              <Clock className="h-5 w-5" /> Recent Activity
-            </h3>
-            <ul className="text-sm space-y-2">
-              <li className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-green-600" />
-                Completed safari at Yala National Park - 2 days ago
-              </li>
-              <li className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-green-600" />
-                Reported elephant sighting - 1 day ago
-              </li>
-            </ul>
-          </div>
+          {/* Assigned Safaris (optional) */}
+          {user?.assignedSafaris && user.assignedSafaris.length > 0 && (
+            <div>
+              <h3 className="font-semibold text-green-900 mb-3 flex items-center gap-2">
+                <MapPin className="h-5 w-5" /> Assigned Safaris
+              </h3>
+              <ul className="text-sm space-y-2">
+                {user.assignedSafaris.map((safari, index) => (
+                  <li key={index} className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-green-600" />
+                    {safari.location} – {safari.date}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Availability */}
           <div>
@@ -118,6 +120,23 @@ export default function DriverProfileSidebar({ isOpen, onClose, user }) {
               {user?.isAvailable ? "Active" : "Inactive"}
             </p>
           </div>
+
+          {/* Optional: Safari Expertise Tags */}
+          {user?.tags?.length > 0 && (
+            <div>
+              <h3 className="font-semibold text-green-900 mb-3">Safari Expertise</h3>
+              <div className="flex flex-wrap gap-2">
+                {user.tags.map((tag, index) => (
+                  <span
+                    key={index}
+                    className="bg-green-200 text-green-800 text-xs px-3 py-1 rounded-full"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </aside>
     </>
