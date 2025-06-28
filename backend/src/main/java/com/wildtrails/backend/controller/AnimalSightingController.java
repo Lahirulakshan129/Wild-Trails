@@ -31,15 +31,13 @@ public class AnimalSightingController {
     @PostMapping
     public ResponseEntity<AnimalSighting> createSighting(@RequestBody AnimalSightingDTO dto,
             Authentication authentication) {
-                System.out.println("Received request to create sighting: " + dto);
+    
         String email = authentication.getName();
-        try {
-            Driver driver = driverRepository.findByUser_Email(email).orElseThrow(() -> new UsernameNotFoundException("Driver not found"));
-            AnimalSighting saved = service.saveAnimalSighting(dto, driver);
-            return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-        } catch (Exception e) {
-            logger.error("Error saving sighting: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+        Driver driver = driverRepository.findByUser_Email(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Driver not found"));
+    
+        AnimalSighting saved = service.saveAnimalSighting(dto, driver);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
+    
 }

@@ -295,7 +295,7 @@ const MapSection = ({ selectedLocation, setSelectedLocation }) => {
           </label>
           <select
             className="w-full p-2 bg-white border border-green-300 rounded-md text-sm text-green-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500"
-            value={filters.animalType}
+            value={filters.animalType}  
             onChange={(e) => setFilters({ ...filters, animalType: e.target.value })}
           >
             <option value="all">All Animals</option>
