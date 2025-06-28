@@ -12,9 +12,9 @@ import {
   SelectValue,
 } from "../ui/driverDashboard-ui/select";
 
-
 const token = localStorage.getItem("token");
 const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8080";
+
 const kumanaBoxes = [
   { minLat: 6.4800, maxLat: 6.5100, minLng: 81.6600, maxLng: 81.7100 },
   { minLat: 6.5100, maxLat: 6.5400, minLng: 81.7000, maxLng: 81.7400 },
@@ -25,12 +25,12 @@ const kumanaBoxes = [
 ];
 
 const demoCoordinates = [
-  { lat: 6.4950, lng: 81.6850 }, // Box 1
-  { lat: 6.5250, lng: 81.7200 }, // Box 2
-  { lat: 6.5550, lng: 81.7300 }, // Box 3
-  { lat: 6.5850, lng: 81.7850 }, // Box 4
-  { lat: 6.6250, lng: 81.7600 }, // Box 5
-  { lat: 6.6750, lng: 81.7950 }, // Box 6
+  { lat: 6.4950, lng: 81.6850 },
+  { lat: 6.5250, lng: 81.7200 },
+  { lat: 6.5550, lng: 81.7300 },
+  { lat: 6.5850, lng: 81.7850 },
+  { lat: 6.6250, lng: 81.7600 },
+  { lat: 6.6750, lng: 81.7950 },
 ];
 
 const getLocalDateTimeString = () => {
@@ -74,15 +74,15 @@ const AnimalSightingForm = ({ onSubmit }) => {
 
   useEffect(() => {
     setDateTime(getLocalDateTimeString());
-
+  
     if (useDemoLocation) {
       const demoLoc = getRandomDemoLocation();
       setSelectedLocation(demoLoc);
-      setIsValidLocation(true);
+      setIsValidLocation(isWithinKumana(demoLoc.lat, demoLoc.lng));
       setIsLoadingLocation(false);
       return;
     }
-
+  
     if (navigator.geolocation) {
       setIsLoadingLocation(true);
       navigator.geolocation.getCurrentPosition(
@@ -105,24 +105,18 @@ const AnimalSightingForm = ({ onSubmit }) => {
       setIsLoadingLocation(false);
     }
   }, [useDemoLocation]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setDateTime(getLocalDateTimeString());
-    }, 60000);
-    return () => clearInterval(interval);
-  }, []);
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!animalName.trim() || !dateTime || !isValidLocation) {
       toast.error("Please fill all required fields.");
-      return; 
+      return;
     }
-  
+
     setIsSubmitting(true);
-  
+
     try {
       const newSighting = {
         animalName: animalName.trim(),
@@ -131,10 +125,8 @@ const AnimalSightingForm = ({ onSubmit }) => {
         lat: selectedLocation.lat,
         lng: selectedLocation.lng,
       };
-  
-      console.log("Submitting animal sighting to backend:", newSighting);
-      console.log("Using token:", token);
-  
+
+      console.log("Submitting Sighting JSON:", JSON.stringify(newSighting, null, 2));
       const response = await fetch(`${BASE_URL}/api/sightings`, {
         method: "POST",
         headers: {
@@ -143,16 +135,17 @@ const AnimalSightingForm = ({ onSubmit }) => {
         },
         body: JSON.stringify(newSighting),
       });
-  
+
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed with status ${response.status}: ${errorText}`);
+        const errorData = await response.json();
+        toast.error(errorData.message || "Failed to submit sighting.");
+        return;
       }
-  
+
       if (onSubmit && typeof onSubmit === "function") {
         await onSubmit(newSighting);
       }
-  
+      toast.success("Sighting submitted successfully!");
       setAnimalName("");
       setNotes("");
     } catch (error) {
@@ -167,34 +160,22 @@ const AnimalSightingForm = ({ onSubmit }) => {
       <div className="flex items-start">
         <div className="w-full">
           <div className="flex justify-between items-start">
-            <h3 className="font-medium text-emerald-800 text-lg">
-              Animal Sighting Report
-            </h3>
-            <span className="inline-block px-2 py-0.5 text-xs font-semibold rounded bg-emerald-100 text-emerald-800">
-              REPORT
-            </span>
+            <h3 className="font-medium text-emerald-800 text-lg">Animal Sighting Report</h3>
+            <span className="inline-block px-2 py-0.5 text-xs font-semibold rounded bg-emerald-100 text-emerald-800">REPORT</span>
           </div>
-          
-          <p className="text-sm text-gray-600 mt-1.5 mb-4">
-            Record details of any wildlife sightings during your safari.
-          </p>
+
+          <p className="text-sm text-gray-600 mt-1.5 mb-4">Record details of any wildlife sightings during your safari.</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="animalName" className="block text-sm font-medium mb-1.5 text-gray-700">
-                Animal Species*
-              </Label>
+              <Label htmlFor="animalName" className="block text-sm font-medium mb-1.5 text-gray-700">Animal Species*</Label>
               <Select value={animalName} onValueChange={setAnimalName} required>
                 <SelectTrigger className="w-full bg-white border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm">
                   <SelectValue placeholder="Select an animal" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border border-gray-300 rounded-md shadow-lg">
                   {animalOptions.map((option) => (
-                    <SelectItem 
-                      key={option.value} 
-                      value={option.value}
-                      className="hover:bg-emerald-50 focus:bg-emerald-50 text-sm"
-                    >
+                    <SelectItem key={option.value} value={option.value} className="hover:bg-emerald-50 focus:bg-emerald-50 text-sm">
                       {option.label}
                     </SelectItem>
                   ))}
@@ -203,45 +184,23 @@ const AnimalSightingForm = ({ onSubmit }) => {
             </div>
 
             <div>
-              <Label htmlFor="dateTime" className="block text-sm font-medium mb-1.5 text-gray-700">
-                Date & Time*
-              </Label>
-              <Input
-                id="dateTime"
-                type="datetime-local"
-                value={dateTime}
-                readOnly
-                className="w-full bg-gray-50 border border-gray-300 rounded-md px-3 py-2 text-gray-700 text-sm"
-              />
+              <Label htmlFor="dateTime" className="block text-sm font-medium mb-1.5 text-gray-700">Date & Time*</Label>
+              <Input id="dateTime" type="datetime-local" value={dateTime} readOnly className="w-full bg-gray-50 border border-gray-300 rounded-md px-3 py-2 text-gray-700 text-sm" />
             </div>
 
             <div>
-              <Label htmlFor="notes" className="block text-sm font-medium mb-1.5 text-gray-700">
-                Notes
-              </Label>
-              <Textarea
-                id="notes"
-                placeholder="Additional observations (behavior, group size, etc.)"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 h-24 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
-              />
+              <Label htmlFor="notes" className="block text-sm font-medium mb-1.5 text-gray-700">Notes</Label>
+              <Textarea id="notes" placeholder="Additional observations (behavior, group size, etc.)" value={notes} onChange={(e) => setNotes(e.target.value)} className="w-full border border-gray-300 rounded-md px-3 py-2 h-24 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm" />
             </div>
 
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <Label className="block text-sm font-medium text-gray-700">
-                  Location
-                </Label>
-                <button
-                  type="button"
-                  onClick={() => setUseDemoLocation(!useDemoLocation)}
-                  className="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded text-gray-600"
-                >
+                <Label className="block text-sm font-medium text-gray-700">Location</Label>
+                <button type="button" onClick={() => setUseDemoLocation(!useDemoLocation)} className="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded text-gray-600">
                   {useDemoLocation ? "Use Real Location" : "Use Demo Location"}
                 </button>
               </div>
-              
+
               {isLoadingLocation ? (
                 <div className="flex items-center justify-center h-10 border border-gray-300 rounded-md bg-gray-50">
                   <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-emerald-500"></div>
@@ -250,8 +209,8 @@ const AnimalSightingForm = ({ onSubmit }) => {
               ) : (
                 <div className="space-y-2">
                   <div className={`w-full border rounded-md px-3 py-2 text-sm ${
-                    isValidLocation 
-                      ? "bg-emerald-50 border-emerald-200 text-emerald-800" 
+                    isValidLocation
+                      ? "bg-emerald-50 border-emerald-200 text-emerald-800"
                       : "bg-red-50 border-red-200 text-red-800"
                   }`}>
                     <div className="flex justify-between">
@@ -266,21 +225,16 @@ const AnimalSightingForm = ({ onSubmit }) => {
                   </div>
                   {useDemoLocation && (
                     <div className="text-xs text-gray-500 bg-yellow-50 p-1.5 rounded">
-                      Using demo location for testing. Click "Use Real Location" to switch back.
+                      Using demo location for testing. Auto-randomizing every 10s.
                     </div>
                   )}
                 </div>
               )}
             </div>
 
-            <Button
-              type="submit"
-              disabled={isSubmitting || !isValidLocation || isLoadingLocation}
-              variant="animalSighting"
-              className={`w-full mt-2 h-12 text-base font-medium transition-all ${
-                isSubmitting ? "bg-emerald-400" : "bg-emerald-600 hover:bg-emerald-700"
-              } text-white`}
-            >
+            <Button type="submit" disabled={isSubmitting || !isValidLocation || isLoadingLocation} variant="animalSighting" className={`w-full mt-2 h-12 text-base font-medium transition-all ${
+              isSubmitting ? "bg-emerald-400" : "bg-emerald-600 hover:bg-emerald-700"
+            } text-white`}>
               {isSubmitting ? (
                 <div className="flex items-center justify-center">
                   <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white mr-2"></div>
@@ -296,9 +250,7 @@ const AnimalSightingForm = ({ onSubmit }) => {
               )}
             </Button>
 
-            <p className="text-xs text-gray-500 text-center mt-2">
-              * Required fields
-            </p>
+            <p className="text-xs text-gray-500 text-center mt-2">* Required fields</p>
           </form>
         </div>
       </div>

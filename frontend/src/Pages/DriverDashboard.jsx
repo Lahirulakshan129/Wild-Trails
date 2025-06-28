@@ -131,6 +131,10 @@ export default function DriverDashboard() {
           lng: location.lng,
         }),
       });
+      if (response.ok) {
+        toast.success("SOS alert sent successfully! Rangers will contact you soon.");
+        
+      }
 
       if (!response.ok) {
         throw new Error("SOS alert failed");

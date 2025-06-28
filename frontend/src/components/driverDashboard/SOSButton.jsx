@@ -13,6 +13,15 @@ const kumanaBoxes = [
   { minLat: 6.6500, maxLat: 6.6900, minLng: 81.7300, maxLng: 81.8600 },
 ];
 
+const demoCoordinates = [
+  { lat: 6.4950, lng: 81.6850 },
+  { lat: 6.5250, lng: 81.7200 },
+  { lat: 6.5550, lng: 81.7300 },
+  { lat: 6.5850, lng: 81.7850 },
+  { lat: 6.6250, lng: 81.7600 },
+  { lat: 6.6750, lng: 81.7950 },
+];
+
 const isWithinKumana = (lat, lng) => {
   return kumanaBoxes.some(
     (box) =>
@@ -23,6 +32,11 @@ const isWithinKumana = (lat, lng) => {
   );
 };
 
+const getRandomDemoLocation = () => {
+  const randomIndex = Math.floor(Math.random() * demoCoordinates.length);
+  return demoCoordinates[randomIndex];
+};
+
 const SOSButton = ({ onSOS }) => {
   const [isTriggering, setIsTriggering] = useState(false);
   const [pulseAnimation, setPulseAnimation] = useState(false);
@@ -30,8 +44,17 @@ const SOSButton = ({ onSOS }) => {
   const [currentLocation, setCurrentLocation] = useState(null);
   const [isValidLocation, setIsValidLocation] = useState(false);
   const [isLoadingLocation, setIsLoadingLocation] = useState(true);
+  const [useDemoLocation, setUseDemoLocation] = useState(false);
 
   useEffect(() => {
+    if (useDemoLocation) {
+      const demoLoc = getRandomDemoLocation();
+      setCurrentLocation(demoLoc);
+      setIsValidLocation(isWithinKumana(demoLoc.lat, demoLoc.lng));
+      setIsLoadingLocation(false);
+      return;
+    }
+
     if (navigator.geolocation) {
       setIsLoadingLocation(true);
       navigator.geolocation.getCurrentPosition(
@@ -53,7 +76,7 @@ const SOSButton = ({ onSOS }) => {
       console.warn("Geolocation is not supported by this browser.");
       setIsLoadingLocation(false);
     }
-  }, []);
+  }, [useDemoLocation]);
 
   const handleSOSClick = () => {
     setShowConfirmation(true);
@@ -84,6 +107,10 @@ const SOSButton = ({ onSOS }) => {
     setShowConfirmation(false);
   };
 
+  const toggleDemoMode = () => {
+    setUseDemoLocation(prev => !prev);
+  };
+
   return (
     <div className="p-3 rounded-lg border border-red-100 bg-red-50 hover:bg-red-50/80 mb-3">
       <div className="flex items-start">
@@ -97,21 +124,37 @@ const SOSButton = ({ onSOS }) => {
               EMERGENCY
             </span>
           </div>
-          
+
           <p className="text-sm text-gray-600 mt-1.5">
             Press the button below to send your current location to all nearby rangers and emergency services.
           </p>
+
+          <div className="flex justify-between items-center mt-2 mb-1">
+            <p className="text-xs font-medium text-gray-700">
+              Current Location Mode:
+            </p>
+            <button
+              type="button"
+              onClick={toggleDemoMode}
+              className="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded text-gray-600"
+            >
+              {useDemoLocation ? "Use Real GPS" : "Use Test GPS"}
+            </button>
+          </div>
 
           <Button
             onClick={handleSOSClick}
             disabled={isTriggering || isLoadingLocation}
             variant="emergency"
-            className={`w-full mt-3 h-12 text-lg font-bold transition-all ${
+            className={`w-full mt-1 h-12 text-lg font-bold transition-all ${
               pulseAnimation ? "animate-pulse" : ""
             }`}
           >
-            {isLoadingLocation ? "GETTING LOCATION..." : 
-             isTriggering ? "SENDING SOS..." : "🚨 SEND SOS"}
+            {isLoadingLocation
+              ? "GETTING LOCATION..."
+              : isTriggering
+              ? "SENDING SOS..."
+              : "🚨 SEND SOS"}
           </Button>
 
           {isLoadingLocation ? (
@@ -121,10 +164,20 @@ const SOSButton = ({ onSOS }) => {
           ) : (
             <p className="mt-2 text-xs text-center">
               {isValidLocation ? (
-                <span className="text-green-600">✅ You are within Kumana National Park</span>
+                <span className="text-green-600">
+                  ✅ You are within Kumana National Park
+                </span>
               ) : (
-                <span className="text-red-600">❌ Outside park boundaries - SOS unavailable</span>
+                <span className="text-red-600">
+                  ❌ Outside park boundaries - SOS unavailable
+                </span>
               )}
+            </p>
+          )}
+
+          {useDemoLocation && (
+            <p className="mt-1 text-[11px] text-yellow-700 bg-yellow-100 px-2 py-1 rounded text-center">
+              Test mode active. Coordinates are randomly generated from demo list.
             </p>
           )}
 
@@ -139,11 +192,11 @@ const SOSButton = ({ onSOS }) => {
         onConfirm={handleConfirm}
         onCancel={handleCancel}
         locationStatus={{
-          coordinates: currentLocation 
+          coordinates: currentLocation
             ? `${currentLocation.lat.toFixed(5)}, ${currentLocation.lng.toFixed(5)}`
             : "Unknown",
           isValid: isValidLocation,
-          isLoading: isLoadingLocation
+          isLoading: isLoadingLocation,
         }}
       />
     </div>
