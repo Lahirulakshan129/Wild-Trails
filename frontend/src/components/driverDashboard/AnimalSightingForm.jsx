@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 import { Button } from "../ui/home-ui/button";
 import { Input } from "../ui/driverDashboard-ui/input";
 import { Textarea } from "../ui/driverDashboard-ui/textarea";
@@ -15,22 +15,26 @@ import {
 const token = localStorage.getItem("token");
 const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8080";
 
-const kumanaBoxes = [
-  { minLat: 6.4800, maxLat: 6.5100, minLng: 81.6600, maxLng: 81.7100 },
-  { minLat: 6.5100, maxLat: 6.5400, minLng: 81.7000, maxLng: 81.7400 },
-  { minLat: 6.5400, maxLat: 6.5700, minLng: 81.6900, maxLng: 81.7700 },
-  { minLat: 6.5700, maxLat: 6.6000, minLng: 81.7500, maxLng: 81.8200 },
-  { minLat: 6.6000, maxLat: 6.6500, minLng: 81.7200, maxLng: 81.8000 },
-  { minLat: 6.6500, maxLat: 6.6900, minLng: 81.7300, maxLng: 81.8600 },
+// Polygon coordinates of Kumana Park (latitude, longitude)
+const kumanaParkBoundary = [
+  [6.285, 81.690], [6.290, 81.650], [6.300, 81.600], [6.320, 81.550],
+  [6.340, 81.500], [6.360, 81.470], [6.380, 81.450], [6.400, 81.430],
+  [6.420, 81.420], [6.440, 81.410], [6.460, 81.400], [6.480, 81.405],
+  [6.500, 81.415], [6.520, 81.430], [6.540, 81.450], [6.560, 81.480],
+  [6.580, 81.510], [6.600, 81.540], [6.620, 81.570], [6.640, 81.600],
+  [6.660, 81.630], [6.680, 81.660], [6.700, 81.700], [6.690, 81.740],
+  [6.670, 81.770], [6.650, 81.790], [6.630, 81.800], [6.600, 81.810],
+  [6.570, 81.820], [6.540, 81.830], [6.510, 81.840], [6.480, 81.850],
+  [6.450, 81.845], [6.420, 81.840], [6.390, 81.830], [6.360, 81.810],
+  [6.330, 81.780], [6.300, 81.740], [6.285, 81.690]
 ];
 
 const demoCoordinates = [
-  { lat: 6.4950, lng: 81.6850 },
-  { lat: 6.5250, lng: 81.7200 },
-  { lat: 6.5550, lng: 81.7300 },
-  { lat: 6.5850, lng: 81.7850 },
-  { lat: 6.6250, lng: 81.7600 },
-  { lat: 6.6750, lng: 81.7950 },
+  { lat: 6.547939, lng: 81.688521 },
+  { lat: 6.571841, lng: 81.713383 },
+  { lat: 6.566790, lng: 81.700198 },
+  { lat: 6.474983, lng: 81.654569 },
+  { lat: 6.515333, lng: 81.628845 },
 ];
 
 const getLocalDateTimeString = () => {
@@ -57,14 +61,15 @@ const AnimalSightingForm = ({ onSubmit }) => {
     { value: "Rare Animal", label: "Rare Animal" },
   ];
 
-  const isWithinKumana = (lat, lng) => {
-    return kumanaBoxes.some(
-      (box) =>
-        lat >= box.minLat &&
-        lat <= box.maxLat &&
-        lng >= box.minLng &&
-        lng <= box.maxLng
-    );
+  const isWithinKumanaPolygon = (lat, lng) => {
+    if (!window.google?.maps?.geometry) return false;
+
+    const point = new window.google.maps.LatLng(lat, lng);
+    const polygon = new window.google.maps.Polygon({
+      paths: kumanaParkBoundary.map(([lat, lng]) => new window.google.maps.LatLng(lat, lng)),
+    });
+
+    return window.google.maps.geometry.poly.containsLocation(point, polygon);
   };
 
   const getRandomDemoLocation = () => {
@@ -74,26 +79,26 @@ const AnimalSightingForm = ({ onSubmit }) => {
 
   useEffect(() => {
     setDateTime(getLocalDateTimeString());
-  
+
+    const processLocation = (lat, lng) => {
+      setSelectedLocation({ lat, lng });
+      const isValid = isWithinKumanaPolygon(lat, lng);
+      setIsValidLocation(isValid);
+      setIsLoadingLocation(false);
+    };
+
     if (useDemoLocation) {
       const demoLoc = getRandomDemoLocation();
-      setSelectedLocation(demoLoc);
-      setIsValidLocation(isWithinKumana(demoLoc.lat, demoLoc.lng));
-      setIsLoadingLocation(false);
+      processLocation(demoLoc.lat, demoLoc.lng);
       return;
     }
-  
+
     if (navigator.geolocation) {
       setIsLoadingLocation(true);
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const newLocation = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
-          setSelectedLocation(newLocation);
-          setIsValidLocation(isWithinKumana(newLocation.lat, newLocation.lng));
-          setIsLoadingLocation(false);
+          const { latitude, longitude } = position.coords;
+          processLocation(latitude, longitude);
         },
         (error) => {
           console.error("Error fetching location:", error);
@@ -105,7 +110,6 @@ const AnimalSightingForm = ({ onSubmit }) => {
       setIsLoadingLocation(false);
     }
   }, [useDemoLocation]);
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -126,8 +130,7 @@ const AnimalSightingForm = ({ onSubmit }) => {
         lng: selectedLocation.lng,
       };
 
-      console.log("Submitting Sighting JSON:", JSON.stringify(newSighting, null, 2));
-      const response = await fetch(`${BASE_URL}/api/sightings`, {
+      const response = await fetch(`${BASE_URL}/api/sightings/createSighting`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -138,9 +141,11 @@ const AnimalSightingForm = ({ onSubmit }) => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        toast.error(errorData.message || "Failed to submit sighting.");
+        toast.error(errorData.message || "Something went wrong");
         return;
-      }
+    }
+      const data1 = await response.json();
+      console.log("Sighting submitted:", data1);
 
       if (onSubmit && typeof onSubmit === "function") {
         await onSubmit(newSighting);

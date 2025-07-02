@@ -38,6 +38,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
                 .requestMatchers("/api/sightings").hasRole("DRIVER")
                 .requestMatchers("/api/sightings/**").hasRole("DRIVER")
+                .requestMatchers("/ws-sightings/**", "/ws/**", "/ws-sightings/info/**").permitAll()
+                .requestMatchers("/uploads/**").permitAll()
+                
+
                 .anyRequest().authenticated()
             )
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

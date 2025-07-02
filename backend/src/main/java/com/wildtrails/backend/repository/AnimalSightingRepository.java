@@ -11,5 +11,6 @@ import com.wildtrails.backend.entity.AnimalSighting;
 @Repository
 public interface AnimalSightingRepository extends JpaRepository<AnimalSighting, Long> {
     List<AnimalSighting> findByAnimalNameAndDateTimeAfter(String animalName, LocalDateTime dateTime);
+    List<AnimalSighting> findByDateTimeAfter(LocalDateTime time);
 
 }

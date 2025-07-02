@@ -1,6 +1,42 @@
+import { useEffect, useState } from "react";
 import { X, User, Car, Star, MapPin, Clock } from "lucide-react";
 
 export default function DriverProfileSidebar({ isOpen, onClose, user }) {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const [driverData, setDriverData] = useState({
+    photo: "/Placeholders/person-placeholder.jpg",
+    isAvailable: false,
+    vehicleType: "",
+    seatingCapacity: 0,
+  });
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const token = localStorage.getItem("token");
+
+    fetch(`${backendUrl}/api/driver/get_loggedin`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch driver data");
+        return res.json();
+      })
+      .then((data) => {
+        setDriverData({
+          photo: data.photo_url ? `${backendUrl}${data.photo_url}` : "/Placeholders/person-placeholder.jpg",
+          isAvailable: data.isAvailable,
+          vehicleType: data.vehicle_type || "",
+          seatingCapacity: data.seating_capacity ?? 0,
+        });
+      })
+      .catch((err) => {
+        console.error("Failed to fetch driver profile", err);
+      });
+  }, [isOpen]);
+
   return (
     <>
       {/* Backdrop */}
@@ -36,7 +72,7 @@ export default function DriverProfileSidebar({ isOpen, onClose, user }) {
           <div className="flex flex-col items-center text-center">
             <div className="relative">
               <img
-                src={user?.photo || "/Placeholders/person-placeholder.jpg"}
+                src={driverData.photo}
                 alt="Driver profile"
                 className="w-28 h-28 rounded-full object-cover border-4 border-green-200 shadow-md"
               />
@@ -44,7 +80,6 @@ export default function DriverProfileSidebar({ isOpen, onClose, user }) {
             </div>
             <p className="text-2xl mt-3 font-bold text-green-900">{user?.name || "Unknown Driver"}</p>
             <p className="text-sm text-gray-500">{user?.email || "No email provided"}</p>
-            <p className="text-xs text-gray-400 mt-1">Driver ID: {user?.id || "N/A"}</p>
           </div>
 
           {/* Driver Stats */}
@@ -73,7 +108,7 @@ export default function DriverProfileSidebar({ isOpen, onClose, user }) {
                   <div
                     className="bg-green-600 h-2.5 rounded-full"
                     style={{ width: `${(user?.yearsExperience || 5) * 10}%` }}
-                  ></div>
+                  />
                 </div>
                 <p className="text-xs text-gray-500 mt-1">{user?.yearsExperience || 5} years</p>
               </div>
@@ -85,17 +120,18 @@ export default function DriverProfileSidebar({ isOpen, onClose, user }) {
             <h3 className="font-semibold text-green-900 mb-3 flex items-center gap-2">
               <Car className="h-5 w-5" /> Vehicle Info
             </h3>
-            {user?.vehicleType ? (
+            {driverData.vehicleType ? (
               <p className="text-sm text-gray-700">
-                {user.vehicleType} – {user.seatingCapacity || "N/A"} Seater
+                {driverData.vehicleType} –{" "}
+                {driverData.seatingCapacity > 0 ? driverData.seatingCapacity : "N/A"} Seater
               </p>
             ) : (
               <p className="text-sm text-gray-500">No vehicle details available</p>
             )}
           </div>
 
-          {/* Assigned Safaris (optional) */}
-          {user?.assignedSafaris && user.assignedSafaris.length > 0 && (
+          {/* Assigned Safaris */}
+          {user?.assignedSafaris?.length > 0 && (
             <div>
               <h3 className="font-semibold text-green-900 mb-3 flex items-center gap-2">
                 <MapPin className="h-5 w-5" /> Assigned Safaris
@@ -116,21 +152,18 @@ export default function DriverProfileSidebar({ isOpen, onClose, user }) {
             <h3 className="font-semibold text-green-900 mb-3 flex items-center gap-2">
               <Clock className="h-5 w-5" /> Availability
             </h3>
-            <p className={`text-sm ${user?.isAvailable ? "text-green-700" : "text-red-700"}`}>
-              {user?.isAvailable ? "Active" : "Inactive"}
+            <p className={`text-sm ${driverData.isAvailable ? "text-green-700" : "text-red-700"}`}>
+              {driverData.isAvailable ? "Active" : "Inactive"}
             </p>
           </div>
 
-          {/* Optional: Safari Expertise Tags */}
+          {/* Safari Expertise Tags */}
           {user?.tags?.length > 0 && (
             <div>
               <h3 className="font-semibold text-green-900 mb-3">Safari Expertise</h3>
               <div className="flex flex-wrap gap-2">
                 {user.tags.map((tag, index) => (
-                  <span
-                    key={index}
-                    className="bg-green-200 text-green-800 text-xs px-3 py-1 rounded-full"
-                  >
+                  <span key={index} className="bg-green-200 text-green-800 text-xs px-3 py-1 rounded-full">
                     {tag}
                   </span>
                 ))}

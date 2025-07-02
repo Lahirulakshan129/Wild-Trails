@@ -15,6 +15,7 @@ public class Driver {
     @JoinColumn(name = "id")
     private User user;
 
+    private String photo_url;
     private String vehicle_type;
     private int seating_capacity;
     private boolean is_available;

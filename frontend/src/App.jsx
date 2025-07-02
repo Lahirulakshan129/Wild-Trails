@@ -26,7 +26,7 @@ function App() {
       />
       <Route path="/review" element={<Review />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
-      <Route path="/userDashboard" element={<UserDashboard />} />
+      <Route path="/customerDashboard" element={<UserDashboard />} />
       <Route
         path="/AdminDashboard"
         element={

@@ -1,91 +1,54 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { Card } from "../ui/driverDashboard-ui/card";
 import PropTypes from "prop-types";
-import SightingForm from "./AnimalSightingForm";
-import { PawPrint } from "lucide-react";
-
-// Marker pool for recycling markers
-const MARKER_POOL_SIZE = 20;
-let markerPool = [];
+import { jwtDecode } from 'jwt-decode'; // Named import
 
 const MapSection = ({ selectedLocation, setSelectedLocation }) => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
+  const markerPoolRef = useRef([]);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [apiError, setApiError] = useState(null);
   const [sightings, setSightings] = useState([]);
-  const [showForm, setShowForm] = useState(false);
-  const [filters, setFilters] = useState({
-    animalType: 'all',
-    timeRange: '10min'
-  });
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [sosAlerts, setSosAlerts] = useState([]);
+  const [filters, setFilters] = useState({ animalType: "all" });
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Get marker from pool or create new one
-  const getMarker = () => {
-    if (markerPool.length > 0) {
-      return markerPool.pop();
+  // Check if token is expired
+  const isTokenExpired = (token) => {
+    try {
+      const decoded = jwtDecode(token); // Named import
+      const currentTime = Math.floor(Date.now() / 1000);
+      return decoded.exp < currentTime;
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      return true; // Assume expired if decoding fails
     }
-    return new window.google.maps.marker.AdvancedMarkerElement();
   };
 
-  // Return marker to pool
-  const releaseMarker = (marker) => {
-    marker.map = null;
-    markerPool.push(marker);
-  };
 
-  // Dummy data
-  const dummySightings = useMemo(() => [
-    {
-      id: '1',
-      animal_type: 'Elephant',
-      location_lat: 6.536939,
-      location_lng: 81.707786,
-      timestamp: new Date().toISOString(),
-      image_url: null,
-      reported_by: 'driver-1',
-      notes: 'Large herd near waterhole'
-    },
-    {
-      id: '2',
-      animal_type: 'Leopard',
-      location_lat: 6.473,
-      location_lng: 81.675,
-      timestamp: new Date(Date.now() - 5 * 60000).toISOString(),
-      image_url: null,
-      reported_by: 'driver-2',
-      notes: 'Resting on a tree'
-    },
-    {
-      id: '3',
-      animal_type: 'Bear',
-      location_lat: 6.469,
-      location_lng: 81.675,
-      timestamp: new Date(Date.now() - 15 * 60000).toISOString(),
-      image_url: null,
-      reported_by: 'driver-3',
-      notes: 'Crossing the road'
-    }
-  ], []);
-
-  // Load Google Maps script
+  // Load Google Maps
   useEffect(() => {
     if (window.google?.maps?.Map) {
+      console.log("Google Maps API already loaded");
       setMapLoaded(true);
       return;
     }
-
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&loading=async&libraries=marker&callback=initMap`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=marker&callback=initMap`;
     script.async = true;
     script.defer = true;
-    script.onerror = () => setApiError("Failed to load Google Maps API");
-
-    window.initMap = () => setMapLoaded(true);
+    script.onerror = () => {
+      console.error("Failed to load Google Maps API");
+      setApiError("Failed to load Google Maps API");
+    };
+    window.initMap = () => {
+      console.log("Google Maps API loaded successfully");
+      setMapLoaded(true);
+    };
     document.head.appendChild(script);
-
     return () => {
+      console.log("Cleaning up Google Maps script");
       document.head.removeChild(script);
       delete window.initMap;
     };
@@ -93,239 +56,270 @@ const MapSection = ({ selectedLocation, setSelectedLocation }) => {
 
   // Initialize map
   useEffect(() => {
-    if (!mapLoaded || !selectedLocation) return;
-
+    if (!mapLoaded || !selectedLocation) {
+      console.log("Map not loaded or no selected location:", { mapLoaded, selectedLocation });
+      return;
+    }
     try {
+      console.log("Initializing map with center:", selectedLocation);
       mapInstanceRef.current = new window.google.maps.Map(mapRef.current, {
-        center: {
-          lat: selectedLocation.lat,
-          lng: selectedLocation.lng
-        },
+        center: selectedLocation,
         zoom: 12,
-        mapId: "6bbf28f0a2a779649aa95dc3",
         disableDefaultUI: true,
-        gestureHandling: "greedy"
+        gestureHandling: "greedy",
+        mapId: "6bbf28f0a2a779649aa95dc3",
       });
-
-      return () => {
-        if (mapInstanceRef.current) {
-          window.google.maps.event.clearInstanceListeners(mapInstanceRef.current);
-        }
-      };
+      console.log("Map initialized:", mapInstanceRef.current);
     } catch (error) {
       console.error("Error initializing map:", error);
       setApiError("Error initializing map");
     }
+    return () => {
+      if (mapInstanceRef.current) {
+        console.log("Clearing map instance listeners");
+        window.google.maps.event.clearInstanceListeners(mapInstanceRef.current);
+      }
+    };
   }, [mapLoaded, selectedLocation]);
 
-  // Load dummy data with time-based filtering
+  // Fetch sightings and SOS alerts with polling
   useEffect(() => {
-    const filterSightings = () => {
-      const now = new Date();
-      const tenMinutesAgo = new Date(now.getTime() - 10 * 60000);
-      return dummySightings.filter(s => new Date(s.timestamp) >= tenMinutesAgo);
+    const fetchData = async () => {
+      setIsLoading(true);
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setApiError("No authentication token found");
+        setIsLoading(false);
+        return;
+      }
+      if (isTokenExpired(token)) {
+        const newToken = await refreshToken();
+        if (!newToken) {
+          setApiError("Token refresh failed");
+          setIsLoading(false);
+          return;
+        }
+      }
+      try {
+        const [sRes, sosRes] = await Promise.all([
+          fetch(`${import.meta.env.VITE_BACKEND_URL}/api/sightings/recent`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          }),
+          fetch(`${import.meta.env.VITE_BACKEND_URL}/api/driver/sos/unresolved`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          }),
+        ]);
+        if (sRes.ok) {
+          const data = await sRes.json();
+          console.log("Fetched sightings:", data);
+          setSightings(data);
+        } else {
+          console.error("Sightings fetch failed:", sRes.status);
+        }
+        if (sosRes.ok) {
+          const data = await sosRes.json();
+          console.log("Fetched SOS alerts:", data);
+          setSosAlerts(data);
+        } else {
+          console.error("SOS fetch failed:", sosRes.status);
+        }
+      } catch (e) {
+        console.error("Fetch error:", e);
+        setApiError(`Failed to fetch data: ${e.message}`);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    setSightings(filterSightings());
-    
+    fetchData();
     const interval = setInterval(() => {
-      setSightings(filterSightings());
+      console.log("Polling for data");
+      fetchData();
     }, 30000);
+    return () => {
+      console.log("Clearing polling interval");
+      clearInterval(interval);
+    };
+  }, []);
 
-    return () => clearInterval(interval);
-  }, [dummySightings]);
-
-  // Get filtered sightings
+  // Filter sightings
   const filteredSightings = useMemo(() => {
-    const now = new Date();
-    const tenMinutesAgo = new Date(now.getTime() - 10 * 60000);
-
-    return sightings.filter(sighting => {
-      const isRecent = new Date(sighting.timestamp) >= tenMinutesAgo;
-      const matchesAnimalType = filters.animalType === 'all' || 
-        sighting.animal_type.toLowerCase() === filters.animalType.toLowerCase();
-      
-      return isRecent && matchesAnimalType;
-    });
+    console.log("Recalculating filteredSightings, filters:", filters);
+    const lowerFilter = filters.animalType.toLowerCase();
+    return filters.animalType === "all"
+      ? sightings
+      : sightings.filter((s) => s.animalName?.toLowerCase().includes(lowerFilter));
   }, [sightings, filters]);
 
-  // Update markers with optimized approach
-  useEffect(() => {
-    if (!mapLoaded || !mapInstanceRef.current) return;
-
-    try {
-      // First release all markers back to pool
-      markerPool.forEach(releaseMarker);
-      markerPool = [];
-      // Then create new markers for filtered sightings
-      filteredSightings.forEach(sighting => {
-        const marker = getMarker();
-        
-        const pinWrapper = document.createElement("div");
-        pinWrapper.innerHTML = `
-          <div style="position:relative;width:30px;height:40px">
-            <svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
-              <path d="M15 0C6.7 0 0 6.7 0 15c0 8.2 15 27 15 27s15-18.8 15-27C30 6.7 23.3 0 15 0z" fill="${getAnimalColor(sighting.animal_type)}"/>
-            </svg>
-            <div style="position:absolute;top:5px;left:5px;width:20px;height:20px;border-radius:50%;border:2px solid white;background:white;display:flex;align-items:center;justify-content:center">
-              ${getAnimalInitial(sighting.animal_type)}
-            </div>
-          </div>
-        `;
-
-        marker.position = { lat: sighting.location_lat, lng: sighting.location_lng };
-        marker.map = mapInstanceRef.current;
-        marker.content = pinWrapper;
-        marker.title = `${sighting.animal_type} - ${new Date(sighting.timestamp).toLocaleString()}`;
-
-        markerPool.push(marker);
-      });
-
-    } catch (error) {
-      console.error("Error updating markers:", error);
-    }
-
-    return () => {
-      // Cleanup markers on unmount
-      markerPool.forEach(marker => {
-        marker.map = null;
-        if (marker.content) {
-          marker.content.remove();
-        }
-      });
-      markerPool = [];
-    };
-  }, [mapLoaded, filteredSightings]);
-
-  // Helper functions
+  // Helper functions for markers
   const getAnimalColor = (name) => {
-    const lower = name.toLowerCase();
+    const lower = name?.toLowerCase() || "";
     if (lower.includes("elephant")) return "#2A9D8F";
     if (lower.includes("leopard")) return "#E9C46A";
     if (lower.includes("bear")) return "#264653";
+    if (lower.includes("tiger")) return "#F4A261";
     return "#E76F51";
   };
 
-  const getAnimalInitial = (name) => name.charAt(0).toUpperCase();
+  const getAnimalInitial = (name) => name?.charAt(0).toUpperCase() || "?";
+
+  // Create marker for animal sightings
+  const createMarker = useCallback((item) => {
+    console.log("Creating sighting marker:", item);
+    const lat = Number(item.lat);
+    const lng = Number(item.lng);
+    if (isNaN(lat) || isNaN(lng) || (lat === 0 && lng === 0)) {
+      console.error("Invalid coordinates for sighting:", { lat, lng });
+      return null;
+    }
+    const color = getAnimalColor(item.animalName || "unknown");
+    const label = getAnimalInitial(item.animalName || "?");
+    const title = `${item.animalName || "Unknown"} — ${new Date(item.dateTime).toLocaleString()}`;
+
+    const pin = document.createElement("div");
+    pin.innerHTML = `
+      <div style="position:relative;width:30px;height:40px">
+        <svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 0C6.7 0 0 6.7 0 15c0 8.2 15 27 15 27s15-18.8 15-27C30 6.7 23.3 0 15 0z" fill="${color}"/>
+        </svg>
+        <div style="position:absolute;top:5px;left:5px;width:20px;height:20px;border-radius:50%;border:2px solid white;background:white;display:flex;align-items:center;justify-content:center;font-size:12px">
+          ${label}
+        </div>
+      </div>`;
+
+    const marker = new window.google.maps.marker.AdvancedMarkerElement({
+      position: { lat, lng },
+      map: mapInstanceRef.current,
+      content: pin,
+      title,
+    });
+    marker.__id = item.sightingId;
+    console.log("Sighting marker created:", marker.__id);
+    return marker;
+  }, []);
+
+  // Create marker for SOS alerts
+  const createSOSMarker = useCallback((alert) => {
+    console.log("Creating SOS marker:", alert);
+    const lat = Number(alert.latitude);
+    const lng = Number(alert.longitude);
+    if (isNaN(lat) || isNaN(lng) || (lat === 0 && lng === 0)) {
+      console.error("Invalid coordinates for SOS alert:", { lat, lng });
+      return null;
+    }
+    const color = "#D00000";
+    const label = "S!";
+    const title = `SOS by ${alert.driverName} — ${alert.details || "No details"}`;
+
+    const pin = document.createElement("div");
+    pin.innerHTML = `
+      <div style="position:relative;width:30px;height:40px">
+        <svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 0C6.7 0 0 6.7 0 15c0 8.2 15 27 15 27s15-18.8 15-27C30 6.7 23.3 0 15 0z" fill="${color}"/>
+        </svg>
+        <div style="position:absolute;top:5px;left:5px;width:20px;height:20px;border-radius:50%;border:2px solid white;background:white;display:flex;align-items:center;justify-content:center;font-size:12px">
+          ${label}
+        </div>
+      </div>`;
+
+    const marker = new window.google.maps.marker.AdvancedMarkerElement({
+      position: { lat, lng },
+      map: mapInstanceRef.current,
+      content: pin,
+      title,
+    });
+    marker.__id = `sos-${alert.alertId}`; // Unique ID to avoid conflicts
+    console.log("SOS marker created:", marker.__id);
+    return marker;
+  }, []);
+
+  // Update markers without adjusting map bounds
+  const updateMarkers = useCallback(() => {
+    console.log("Updating markers, filteredSightings:", filteredSightings, "sosAlerts:", sosAlerts);
+    if (!mapLoaded || !mapInstanceRef.current) {
+      console.log("Map not loaded or map instance missing");
+      return;
+    }
+
+    const currentIds = new Set();
+
+    // Add sighting markers
+    filteredSightings.forEach((item) => {
+      if (!item.sightingId) return;
+      currentIds.add(item.sightingId);
+      const existing = markerPoolRef.current.find((m) => m.__id === item.sightingId);
+      if (!existing) {
+        const marker = createMarker(item);
+        if (marker) {
+          markerPoolRef.current.push(marker);
+          console.log("Added sighting marker:", marker.__id);
+        }
+      }
+    });
+
+    // Add SOS markers
+    sosAlerts.forEach((alert) => {
+      if (!alert.alertId) return;
+      const sosId = `sos-${alert.alertId}`;
+      currentIds.add(sosId);
+      const existing = markerPoolRef.current.find((m) => m.__id === sosId);
+      if (!existing) {
+        const marker = createSOSMarker(alert);
+        if (marker) {
+          markerPoolRef.current.push(marker);
+          console.log("Added SOS marker:", marker.__id);
+        }
+      }
+    });
+
+    // Remove outdated markers
+    markerPoolRef.current = markerPoolRef.current.filter((marker) => {
+      const stillVisible = currentIds.has(marker.__id);
+      if (!stillVisible) {
+        console.log("Removing marker:", marker.__id);
+        marker.map = null;
+        if (marker.content) marker.content.remove();
+      }
+      return stillVisible;
+    });
+
+    console.log("Updated marker pool:", markerPoolRef.current);
+  }, [mapLoaded, filteredSightings, sosAlerts, createMarker, createSOSMarker]);
+
+  // Call updateMarkers when data changes
+  useEffect(() => {
+    updateMarkers();
+  }, [updateMarkers]);
 
   if (apiError) {
     return (
-      <Card className="h-full w-full overflow-hidden flex items-center justify-center">
+      <Card className="h-full flex items-center justify-center">
         <div className="text-red-500">{apiError}</div>
       </Card>
     );
   }
 
   return (
-    <Card className="h-full w-full overflow-hidden relative">
+    <Card className="relative h-full w-full overflow-hidden">
       <div ref={mapRef} className="h-full w-full" />
-      
-      {!mapLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-          <div>Loading map...</div>
+      {isLoading && (
+        <div className="absolute top-4 left-4 bg-white bg-opacity-80 px-3 py-1 rounded-md text-sm">
+          Loading...
         </div>
       )}
-
-      {/* Toggle Button for Mobile */}
-      <button
-        className="absolute top-4 right-4 sm:hidden bg-green-600 text-white p-2 rounded-full z-50"
-        onClick={() => setIsFilterOpen(!isFilterOpen)}
-      >
-        <PawPrint className="h-5 w-5" />
-      </button>
-
-      {/* Bottom Sheet for Mobile */}
-    {/* Mobile Filter Button */}
-<button
-  className="sm:hidden absolute top-4 right-4 bg-green-600 text-white p-3 rounded-full z-50 shadow-lg"
-  onClick={() => setIsFilterOpen(!isFilterOpen)}
->
-  <PawPrint className="h-5 w-5" />
-</button>
-
-{/* Mobile Filter Popover */}
-{isFilterOpen && (
-  <div 
-    className="sm:hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-    onClick={() => setIsFilterOpen(false)} // Close when clicking outside
-  >
-    <div 
-      className="bg-white rounded-xl p-4 w-full max-w-xs"
-      onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
-    >
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-green-800">Filter Animals</h3>
-        <button 
-          onClick={() => setIsFilterOpen(false)}
-          className="text-gray-500 hover:text-gray-700 text-xl"
-        >
-          &times;
-        </button>
-      </div>
-      <div className="relative"> {/* Wrapper for select */}
+      <div className="absolute top-4 right-4">
         <select
-          className="w-full p-3 border border-green-300 rounded-lg text-green-900 appearance-none"
+          className="p-2 border rounded"
           value={filters.animalType}
-          onChange={(e) => {
-            setFilters({ ...filters, animalType: e.target.value });
-            setIsFilterOpen(false);
-          }}
+          onChange={(e) => setFilters({ animalType: e.target.value })}
         >
-          <option value="all">All Animals</option>
+          <option value="all">All</option>
           <option value="elephant">Elephant</option>
           <option value="leopard">Leopard</option>
           <option value="bear">Bear</option>
+          <option value="tiger">Tiger</option>
         </select>
-        {/* Custom dropdown arrow */}
-        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-          <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-          </svg>
-        </div>
       </div>
-    </div>
-  </div>
-)}
-      {/* Desktop Filter */}
-      <div className="hidden sm:block absolute top-4 right-4 z-50 w-60">
-        <div className="bg-gradient-to-br from-green-100 to-green-50 border border-green-200 p-4 rounded-xl shadow-lg">
-          <label className="block text-sm font-semibold text-green-800 mb-2 flex items-center gap-2">
-            <PawPrint className="h-4 w-4 text-green-700" />
-            Filter by Animal
-          </label>
-          <select
-            className="w-full p-2 bg-white border border-green-300 rounded-md text-sm text-green-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-500"
-            value={filters.animalType}  
-            onChange={(e) => setFilters({ ...filters, animalType: e.target.value })}
-          >
-            <option value="all">All Animals</option>
-            <option value="elephant">Elephant</option>
-            <option value="leopard">Leopard</option>
-            <option value="bear">Bear</option>
-          </select>
-        </div>
-      </div>
-
-      {showForm && (
-        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-4 rounded-lg max-w-md w-full">
-            <SightingForm
-              location={selectedLocation}
-              onSubmit={(data) => {
-                const newSighting = {
-                  id: `dummy-${Math.random().toString(36).substr(2, 9)}`,
-                  ...data,
-                  reported_by: 'current-user',
-                  timestamp: new Date().toISOString()
-                };
-                setSightings(prev => [...prev, newSighting]);
-                setShowForm(false);
-              }}
-              onCancel={() => setShowForm(false)}
-            />
-          </div>
-        </div>
-      )}
     </Card>
   );
 };

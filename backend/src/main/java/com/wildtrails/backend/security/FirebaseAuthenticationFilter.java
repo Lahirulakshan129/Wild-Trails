@@ -31,8 +31,8 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
+            HttpServletResponse response,
+            FilterChain filterChain)
             throws ServletException, IOException {
         String requestUri = request.getRequestURI();
         logger.info("FirebaseAuthenticationFilter processing URI: {}", requestUri);
@@ -43,7 +43,13 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
 
         // Only process Firebase endpoints
         if (!normalizedUri.startsWith("/api/auth/firebase/") && !normalizedUri.equals("/api/auth/firebase")) {
-            logger.info("Skipping FirebaseAuthenticationFilter for non-Firebase URI: {}", normalizedUri); // Changed to INFO
+            logger.info("Skipping FirebaseAuthenticationFilter for non-Firebase URI: {}", normalizedUri); // Changed to
+                                                                                                          // INFO
+            filterChain.doFilter(request, response);
+            return;
+        }
+        String path = request.getRequestURI();
+        if (path.startsWith("/ws-sightings") || path.startsWith("/ws")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -82,8 +88,7 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                     user,
                     null,
-                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
-            );
+                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name())));
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
             logger.info("Firebase authentication successful for email: {} with role: {}", email, user.getRole());

@@ -83,5 +83,9 @@ public class AnimalSightingService {
             throw new RuntimeException("Failed to save sighting: " + e.getMessage(), e);
         }
     }
+
+    public List<AnimalSighting> getSightingsAfter(LocalDateTime time) {
+        return repository.findByDateTimeAfter(time);
+    }
     
 }
