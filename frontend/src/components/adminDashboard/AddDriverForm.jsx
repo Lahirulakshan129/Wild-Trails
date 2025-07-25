@@ -1,7 +1,10 @@
 import { useState } from "react";
 import axios from "axios";
+import toast from 'react-hot-toast';
+
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8080";
+const token = localStorage.getItem("token") ;
 
 export default function AdminAddDriverForm() {
   const [form, setForm] = useState({
@@ -23,18 +26,28 @@ export default function AdminAddDriverForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${BASE_URL}/api/admin/register-driver`, {
-        ...form,
-        seatingCapacity: parseInt(form.seatingCapacity)
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}` 
+      const payload = {
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        vehicleType: form.vehicleType,
+        seatingCapacity: parseInt(form.seatingCapacity),
+      };
+  
+      console.log("Sending payload:", payload);
+  
+      await axios.post(
+        `${BASE_URL}/api/admin/register-driver`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
         }
-      }
-    
-    );
-      alert("Driver added!");
+      );
+  
+      toast.success("Driver added successfully!");
       setForm({
         name: "",
         email: "",
@@ -43,9 +56,10 @@ export default function AdminAddDriverForm() {
         seatingCapacity: ""
       });
     } catch (err) {
-      alert("Error adding driver");
+      toast.error("Failed to add driver or email already exists.");
     }
   };
+  
 
   return (
     <form

@@ -8,10 +8,23 @@ import ReviewsTable from "../components/adminDashboard/ReviewsTable";
 import LoyaltyControl from "../components/adminDashboard/LoyaltyControl";
 import SightingSummary from "../components/adminDashboard/SightingSummary";
 import AddDriverForm from "../components/adminDashboard/AddDriverForm";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/adminDashboard-ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/adminDashboard-ui/card";
 import { Badge } from "../components/ui/adminDashboard-ui/Badge";
 import { Button } from "../components/ui/adminDashboard-ui/Button";
-import { CalendarClockIcon, CalendarDaysIcon, CheckCircleIcon, ClockIcon, UsersIcon, XCircleIcon } from "lucide-react";
+import {
+  CalendarClockIcon,
+  CalendarDaysIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  UsersIcon,
+  XCircleIcon,
+} from "lucide-react";
 
 const AdminDashboard = () => {
   const [activeSection, setActiveSection] = useState("overview");
@@ -25,30 +38,84 @@ const AdminDashboard = () => {
   }, []);
 
   const MOCK_TODAYS_SAFARIS = [
-    { id: "TS1", time: "06:30 AM", guide: "Ajith", guests: 6, status: "in-progress" },
-    { id: "TS2", time: "07:00 AM", guide: "Kumar", guests: 4, status: "in-progress" },
-    { id: "TS3", time: "08:30 AM", guide: "Malik", guests: 2, status: "starting-soon" },
-    { id: "TS4", time: "09:30 AM", guide: "Saman", guests: 8, status: "starting-soon" },
-    { id: "TS5", time: "03:30 PM", guide: "Nuwan", guests: 5, status: "scheduled" },
+    {
+      id: "TS1",
+      time: "06:30 AM",
+      guide: "Ajith",
+      guests: 6,
+      status: "in-progress",
+    },
+    {
+      id: "TS2",
+      time: "07:00 AM",
+      guide: "Kumar",
+      guests: 4,
+      status: "in-progress",
+    },
+    {
+      id: "TS3",
+      time: "08:30 AM",
+      guide: "Malik",
+      guests: 2,
+      status: "starting-soon",
+    },
+    {
+      id: "TS4",
+      time: "09:30 AM",
+      guide: "Saman",
+      guests: 8,
+      status: "starting-soon",
+    },
+    {
+      id: "TS5",
+      time: "03:30 PM",
+      guide: "Nuwan",
+      guests: 5,
+      status: "scheduled",
+    },
   ];
 
   const MOCK_BOOKINGS = [
-    { id: "B1", customerName: "John Davis", date: "May 27, 2025", time: "06:30 AM", persons: 4, status: "pending", package: "Morning Safari" },
-    { id: "B2", customerName: "Maria Garcia", date: "May 27, 2025", time: "03:30 PM", persons: 2, status: "driver_accepted", package: "Afternoon Safari" },
-    { id: "B3", customerName: "Robert Wilson", date: "May 28, 2025", time: "06:00 AM", persons: 6, status: "pending", package: "Full Day Safari" },
+    {
+      id: "B1",
+      customerName: "John Davis",
+      date: "May 27, 2025",
+      time: "06:30 AM",
+      persons: 4,
+      status: "pending",
+      package: "Morning Safari",
+    },
+    {
+      id: "B2",
+      customerName: "Maria Garcia",
+      date: "May 27, 2025",
+      time: "03:30 PM",
+      persons: 2,
+      status: "driver_accepted",
+      package: "Afternoon Safari",
+    },
+    {
+      id: "B3",
+      customerName: "Robert Wilson",
+      date: "May 28, 2025",
+      time: "06:00 AM",
+      persons: 6,
+      status: "pending",
+      package: "Full Day Safari",
+    },
   ];
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
-      <Sidebar />
-      
+      {/* <Sidebar /> */}
+
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header 
+        <Header
           title="Dashboard"
           breadcrumbs={["Home", "Dashboard"]}
           adminName={admin?.name}
         />
-        
+
         <main className="flex-1 overflow-y-auto p-6 bg-gradient-to-br from-gray-50 to-safari-cream/30 bg-topography bg-opacity-5">
           {/* Welcome Section */}
           <div className="bg-white p-6 rounded-xl shadow-md mb-6">
@@ -56,48 +123,19 @@ const AdminDashboard = () => {
               Welcome, {admin?.name || "Admin"}!
             </h2>
             <p className="text-gray-600">
-              Manage your wildlife safari operations efficiently from this dashboard.
+              Manage your wildlife safari operations efficiently from this
+              dashboard.
             </p>
           </div>
 
           <div className="space-y-6 pb-8">
             {/* Overview Section */}
             <section id="overview" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatsCard 
-                  title="Total Bookings"
-                  value="124"
-                  icon={<CalendarDaysIcon className="h-5 w-5" />}
-                  trend={{ value: 12, isPositive: true }}
-                />
-                
-                <StatsCard 
-                  title="Pending Confirmation"
-                  value="17"
-                  icon={<ClockIcon className="h-5 w-5" />}
-                  description="Bookings awaiting confirmation"
-                />
-                
-                <StatsCard 
-                  title="Active Users"
-                  value="842"
-                  icon={<UsersIcon className="h-5 w-5" />}
-                  trend={{ value: 8, isPositive: true }}
-                />
-                
-                <StatsCard 
-                  title="Today's Safaris"
-                  value="12"
-                  icon={<CalendarClockIcon className="h-5 w-5" />}
-                  description="3 in progress, 2 starting soon"
-                />
-              </div>
-              
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2">
                   <MapView />
                 </div>
-                
+
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="font-playfair text-lg font-bold text-safari-forest">
@@ -110,56 +148,89 @@ const AdminDashboard = () => {
                   <CardContent>
                     <div className="space-y-3">
                       {MOCK_TODAYS_SAFARIS.map((safari) => (
-                        <div 
-                          key={safari.id} 
+                        <div
+                          key={safari.id}
                           className="flex justify-between items-center p-2 rounded-lg border border-gray-100"
                         >
                           <div>
                             <div className="flex items-center">
-                              <span className="font-medium text-safari-forest">{safari.time}</span>
+                              <span className="font-medium text-safari-forest">
+                                {safari.time}
+                              </span>
                               <span className="mx-2 text-gray-300">•</span>
                               <span className="text-sm">{safari.guide}</span>
                             </div>
                             <div className="text-xs text-gray-500">
-                              {safari.guests} {safari.guests === 1 ? "guest" : "guests"}
+                              {safari.guests}{" "}
+                              {safari.guests === 1 ? "guest" : "guests"}
                             </div>
                           </div>
-                          <Badge 
+                          <Badge
                             variant="outline"
                             className={`
-                              ${safari.status === "in-progress" ? "bg-green-50 text-green-600 border-green-200" : ""}
-                              ${safari.status === "starting-soon" ? "bg-blue-50 text-blue-600 border-blue-200" : ""}
-                              ${safari.status === "scheduled" ? "bg-gray-50 text-gray-600 border-gray-200" : ""}
+                              ${
+                                safari.status === "in-progress"
+                                  ? "bg-green-50 text-green-600 border-green-200"
+                                  : ""
+                              }
+                              ${
+                                safari.status === "starting-soon"
+                                  ? "bg-blue-50 text-blue-600 border-blue-200"
+                                  : ""
+                              }
+                              ${
+                                safari.status === "scheduled"
+                                  ? "bg-gray-50 text-gray-600 border-gray-200"
+                                  : ""
+                              }
                             `}
                           >
-                            {safari.status === "in-progress" ? "In Progress" : ""}
-                            {safari.status === "starting-soon" ? "Starting Soon" : ""}
+                            {safari.status === "in-progress"
+                              ? "In Progress"
+                              : ""}
+                            {safari.status === "starting-soon"
+                              ? "Starting Soon"
+                              : ""}
                             {safari.status === "scheduled" ? "Scheduled" : ""}
                           </Badge>
                         </div>
                       ))}
                     </div>
-                    
+
                     <div className="mt-4 pt-4 border-t border-gray-100">
                       <div className="flex justify-between items-center">
-                        <h4 className="text-sm font-medium text-gray-500">Quick Stats</h4>
-                        <Button variant="outline" size="sm" className="h-7 text-xs">
+                        <h4 className="text-sm font-medium text-gray-500">
+                          Quick Stats
+                        </h4>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 text-xs"
+                        >
                           View All
                         </Button>
                       </div>
-                      
+
                       <div className="grid grid-cols-3 gap-2 mt-2">
                         <div className="border rounded-md p-2 text-center">
-                          <div className="text-xs text-gray-500">Active Drivers</div>
-                          <div className="text-lg font-bold text-safari-forest">8</div>
+                          <div className="text-xs text-gray-500">
+                            Active Drivers
+                          </div>
+                          <div className="text-lg font-bold text-safari-forest">
+                            8
+                          </div>
                         </div>
                         <div className="border rounded-md p-2 text-center">
                           <div className="text-xs text-gray-500">Vehicles</div>
-                          <div className="text-lg font-bold text-safari-forest">12</div>
+                          <div className="text-lg font-bold text-safari-forest">
+                            12
+                          </div>
                         </div>
                         <div className="border rounded-md p-2 text-center">
                           <div className="text-xs text-gray-500">Sightings</div>
-                          <div className="text-lg font-bold text-safari-forest">47</div>
+                          <div className="text-lg font-bold text-safari-forest">
+                            47
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -167,8 +238,8 @@ const AdminDashboard = () => {
                 </Card>
               </div>
             </section>
-            
-            {/* Booking Management Section */}
+
+            {/* Booking Management Section
             <section id="bookings" className="pt-4">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-playfair font-bold text-safari-forest">Booking Management</h2>
@@ -202,8 +273,8 @@ const AdminDashboard = () => {
                   />
                 ))}
               </div>
-            </section>
-            
+            </section> */}
+
             {/* Reviews and Loyalty */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4">
               <div className="lg:col-span-2">
@@ -213,7 +284,7 @@ const AdminDashboard = () => {
                 <LoyaltyControl />
               </div>
             </div>
-            
+
             {/* Driver Management Section */}
             <section id="drivers" className="pt-4">
               <Card>
@@ -225,14 +296,12 @@ const AdminDashboard = () => {
                     Add and manage safari drivers
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <AddDriverForm />
-                </CardContent>
+                <CardContent>{/* <AddDriverForm /> */}</CardContent>
               </Card>
             </section>
-            
+
             {/* Sighting Summary */}
-            <section id="summary" className="pt-4">
+            <section id="summary" className="pt-4 bg-white">
               <SightingSummary />
             </section>
           </div>

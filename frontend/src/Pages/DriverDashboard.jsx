@@ -124,7 +124,7 @@ export default function DriverDashboard() {
       
       console.log("Sending SOS payload:", body);
       
-      const response = await fetch("http://localhost:8080/api/driver/sos", {
+      const response = await fetch("http://localhost:8080/api/sos", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

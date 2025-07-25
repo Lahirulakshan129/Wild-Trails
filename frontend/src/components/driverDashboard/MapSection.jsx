@@ -105,7 +105,7 @@ const MapSection = ({ selectedLocation, setSelectedLocation }) => {
           fetch(`${import.meta.env.VITE_BACKEND_URL}/api/sightings/recent`, {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }),
-          fetch(`${import.meta.env.VITE_BACKEND_URL}/api/driver/sos/unresolved`, {
+          fetch(`${import.meta.env.VITE_BACKEND_URL}/api/sos/unresolved`, {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }),
         ]);

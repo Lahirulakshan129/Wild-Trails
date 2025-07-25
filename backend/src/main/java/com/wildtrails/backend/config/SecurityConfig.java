@@ -37,7 +37,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/driver/**").hasRole("DRIVER")
                 .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
                 .requestMatchers("/api/sightings").hasRole("DRIVER")
-                .requestMatchers("/api/sightings/**").hasRole("DRIVER")
+                .requestMatchers("/api/sos").hasAnyRole("DRIVER","ADMIN")
+                .requestMatchers("/api/review").hasAnyRole("CUSTOMER","ADMIN")
+                .requestMatchers("/api/sightings", "/api/sightings/**").hasAnyRole("DRIVER", "ADMIN")
                 .requestMatchers("/ws-sightings/**", "/ws/**", "/ws-sightings/info/**").permitAll()
                 .requestMatchers("/uploads/**").permitAll()
                 

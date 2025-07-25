@@ -1,5 +1,6 @@
 package com.wildtrails.backend.service;
 
+import com.wildtrails.backend.dto.AnimalHotspotDTO;
 import com.wildtrails.backend.dto.AnimalSightingDTO;
 import com.wildtrails.backend.entity.AnimalSighting;
 import com.wildtrails.backend.entity.Driver;
@@ -87,5 +88,25 @@ public class AnimalSightingService {
     public List<AnimalSighting> getSightingsAfter(LocalDateTime time) {
         return repository.findByDateTimeAfter(time);
     }
-    
+
+    public void deleteASighting(Long id) {
+        if (repository.existsById(id)) {
+            repository.deleteById(id);
+        } else {
+            throw new RuntimeException("Animal sighting not found with ID: " + id);
+        }
+    }
+    public List<AnimalHotspotDTO> getAnimalHotspots() {
+        List<Object[]> results = repository.findCurrentHotspots();
+        return results.stream()
+                .map(result -> new AnimalHotspotDTO(
+                        (String) result[0],  // animal_name
+                        ((Number) result[1]).doubleValue(),  // lat (BigDecimal to Double)
+                        ((Number) result[2]).doubleValue(),  // lng (BigDecimal to Double)
+                        ((Number) result[3]).longValue()    // sightings_count
+                ))
+                .toList();
+    }
+
+
 }

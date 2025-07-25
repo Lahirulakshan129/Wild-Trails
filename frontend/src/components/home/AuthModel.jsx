@@ -9,7 +9,7 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "fire
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8080";
 
-export default function AuthModal({
+export default function   AuthModal({
   onClose,
   isLogin,
   switchToLogin,
@@ -94,7 +94,7 @@ export default function AuthModal({
           await signInWithEmailAndPassword(auth, email, password);
           const token = await auth.currentUser.getIdToken();
   
-          await fetch(`${BASE_URL}/api/auth/firebase`, {
+          await fetch(`${BASE_URL}/api/auth/firebase/verify`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

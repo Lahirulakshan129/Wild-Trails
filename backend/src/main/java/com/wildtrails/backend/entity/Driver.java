@@ -8,7 +8,7 @@ import lombok.Data;
 public class Driver {
 
     @Id
-    private int id; 
+    private int id;
 
     @OneToOne
     @MapsId

@@ -8,6 +8,7 @@ import AdminDashboard from './Pages/AdminDashboard';
 import UserDashboard from './Pages/UserDashboard/UserDashboard';
 import { Toaster } from 'react-hot-toast';
 
+
 function App() {
   console.log("App component rendered");
 
