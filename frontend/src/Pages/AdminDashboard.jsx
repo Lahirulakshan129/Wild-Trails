@@ -1,12 +1,20 @@
 import { useState, useEffect } from "react";
+import { lazy, Suspense } from "react";
 import Sidebar from "../components/adminDashboard/Sidebar";
 import Header from "../components/adminDashboard/Header";
 import StatsCard from "../components/adminDashboard/StatsCard";
 import MapView from "../components/adminDashboard/MapView";
 import BookingItem from "../components/adminDashboard/BookingItem";
-import ReviewsTable from "../components/adminDashboard/ReviewsTable";
+const ReviewsTable = lazy(() =>
+  import("../components/adminDashboard/ReviewsTable")
+);
 import LoyaltyControl from "../components/adminDashboard/LoyaltyControl";
-import SightingSummary from "../components/adminDashboard/SightingSummary";
+const SightingSummary = lazy(() =>
+  import("../components/adminDashboard/SightingSummary")
+);
+const DriverManagement = lazy(() =>
+    import("../components/adminDashboard/DriverManagement.jsx")
+);
 import AddDriverForm from "../components/adminDashboard/AddDriverForm";
 import {
   Card,
@@ -25,6 +33,7 @@ import {
   UsersIcon,
   XCircleIcon,
 } from "lucide-react";
+const token = localStorage.getItem("token");
 
 const AdminDashboard = () => {
   const [activeSection, setActiveSection] = useState("overview");
@@ -118,14 +127,24 @@ const AdminDashboard = () => {
 
         <main className="flex-1 overflow-y-auto p-6 bg-gradient-to-br from-gray-50 to-safari-cream/30 bg-topography bg-opacity-5">
           {/* Welcome Section */}
-          <div className="bg-white p-6 rounded-xl shadow-md mb-6">
-            <h2 className="text-2xl font-bold text-safari-forest mb-2">
-              Welcome, {admin?.name || "Admin"}!
-            </h2>
-            <p className="text-gray-600">
-              Manage your wildlife safari operations efficiently from this
-              dashboard.
-            </p>
+          <div className="bg-white p-6 rounded-xl shadow-md mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-safari-forest mb-2">
+                Welcome, {admin?.name || "Admin"}!
+              </h2>
+              <p className="text-gray-600">
+                Manage your wildlife safari operations efficiently from this dashboard.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <button className="bg-safari-forest text-white px-4 py-2 rounded hover:bg-safari-leaf transition">
+                Driver Management
+              </button>
+              <button className="bg-safari-forest text-white px-4 py-2 rounded hover:bg-safari-leaf transition">
+                Package Management
+              </button>
+            </div>
           </div>
 
           <div className="space-y-6 pb-8">
@@ -278,7 +297,13 @@ const AdminDashboard = () => {
             {/* Reviews and Loyalty */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4">
               <div className="lg:col-span-2">
-                <ReviewsTable />
+                {token ? (
+                  <Suspense fallback={<div>Loading reviews...</div>}>
+                    <ReviewsTable />
+                  </Suspense>
+                ) : (
+                  <div>Checking login status...</div>
+                )}
               </div>
               <div>
                 <LoyaltyControl />
@@ -286,23 +311,14 @@ const AdminDashboard = () => {
             </div>
 
             {/* Driver Management Section */}
-            <section id="drivers" className="pt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="font-playfair text-lg font-bold text-safari-forest">
-                    Driver Management
-                  </CardTitle>
-                  <CardDescription>
-                    Add and manage safari drivers
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>{/* <AddDriverForm /> */}</CardContent>
-              </Card>
-            </section>
+            <DriverManagement></DriverManagement>
+
 
             {/* Sighting Summary */}
             <section id="summary" className="pt-4 bg-white">
-              <SightingSummary />
+              <Suspense fallback={<div>Loading summary...</div>}>
+                <SightingSummary />
+              </Suspense>
             </section>
           </div>
         </main>

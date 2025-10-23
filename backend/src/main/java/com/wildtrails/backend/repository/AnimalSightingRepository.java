@@ -2,9 +2,12 @@ package com.wildtrails.backend.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
+import com.wildtrails.backend.dto.SightingTimeDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.wildtrails.backend.entity.AnimalSighting;
@@ -31,6 +34,17 @@ public interface AnimalSightingRepository extends JpaRepository<AnimalSighting, 
     WHERE sub.rnk = 1
     """, nativeQuery = true)
     List<Object[]> findCurrentHotspots();
+
+    @Query("""
+    SELECT s FROM AnimalSighting s
+    WHERE s.animalName = :animalName
+      AND s.dateTime >= :startDate
+      AND EXTRACT(HOUR FROM s.dateTime) BETWEEN 8 AND 15
+""")
+    List<AnimalSighting> findSightingsByAnimalAndHourRange(
+            @Param("animalName") String animalName,
+            @Param("startDate") LocalDateTime startDate
+    );
 
 
 }

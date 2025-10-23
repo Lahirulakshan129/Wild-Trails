@@ -8,14 +8,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class WebSocketSightingNotifier {
 
-  private final SimpMessagingTemplate messagingTemplate;
-
-  @Autowired
-  public WebSocketSightingNotifier(SimpMessagingTemplate messagingTemplate) {
-    this.messagingTemplate = messagingTemplate;
-  }
-
-  public void notifyNewSighting(AnimalSighting sighting) {
-    messagingTemplate.convertAndSend("/topic/sightings", sighting);
-  }
+//  private final SimpMessagingTemplate messagingTemplate;
+//
+//  @Autowired
+//  public WebSocketSightingNotifier(SimpMessagingTemplate messagingTemplate) {
+//    this.messagingTemplate = messagingTemplate;
+//  }
+//
+//  public void notifyNewSighting(AnimalSighting sighting) {
+//    messagingTemplate.convertAndSend("/topic/sightings", sighting);
+//  }
 }

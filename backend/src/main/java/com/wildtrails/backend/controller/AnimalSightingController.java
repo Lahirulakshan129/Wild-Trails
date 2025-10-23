@@ -1,11 +1,8 @@
 package com.wildtrails.backend.controller;
 
-import com.wildtrails.backend.dto.AnimalHotspotDTO;
-import com.wildtrails.backend.dto.SightingSummeryResponseDTO;
+import com.wildtrails.backend.dto.*;
 import com.wildtrails.backend.service.SightingSummeryService;
 import com.wildtrails.backend.service.AnimalSightingService;
-import com.wildtrails.backend.dto.AnimalSightingDTO;
-import com.wildtrails.backend.dto.AnimalSightingResponseDTO;
 import com.wildtrails.backend.entity.AnimalSighting;
 import com.wildtrails.backend.entity.Driver;
 import com.wildtrails.backend.repository.DriverRepository;
@@ -20,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @PreAuthorize("hasAnyRole('DRIVER','ADMIN')")
@@ -99,5 +97,11 @@ public class AnimalSightingController {
     @GetMapping("/hotspots")
     public List<AnimalHotspotDTO> getHotspots() {
         return service.getAnimalHotspots();
+    }
+
+    @GetMapping("/time-distribution")
+    public ResponseEntity<List<SightingTimeDTO>> getSightingsByTimeDistribution(
+            @RequestParam("animal") String animalName) {
+        return ResponseEntity.ok(service.getSightingsByTimeDistribution(animalName));
     }
 }

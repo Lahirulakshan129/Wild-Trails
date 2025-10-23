@@ -5,12 +5,12 @@ package com.wildtrails.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
 @Table(name = "bookings")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -35,4 +35,21 @@ public class Booking {
 
     @Temporal(TemporalType.DATE) // Specify only date (no time)
     private Date date;
+
+    private String guestUserName;
+    private String guestUserEmail;
+    private String guestUserPhone;
+
+    private Integer numAdults;
+    private Date safariDate;
+    private String pickupLocation;
+    private Double totalAmount;
+    private String paymentStatus;
+    private LocalDateTime bookingDate;
+    private LocalDateTime updatedAt;
+    private String driverStatus; // "assigned", "not assigned", etc.
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "packageId")
+    private Package Package;
 }

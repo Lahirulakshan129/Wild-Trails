@@ -73,7 +73,6 @@ export default {
           'light-green': '#4a7a4a', // From original config
           sand: '#e6d7b8', // From original config and used in Header as safari-sand
           black: '#111111', // From original config
-          teal: '#2A9D8F', // From MapView getAnimalColor (elephant) and Header AvatarFallback
           orange: '#F4A261', // From MapView getAnimalColor (bird) and Header buttons/badge
           forest: '#264653', // From MapView getAnimalColor (bear) and Header text
           leopard: '#E9C46A', // From MapView getAnimalColor (leopard)
@@ -82,8 +81,8 @@ export default {
           'alert-active-fg': '#B91C1C', // From MapView createAlertMarkerElement (active alerts)
           'alert-resolved-bg': '#BBF7D0', // From MapView createAlertMarkerElement (resolved alerts)
           'alert-resolved-fg': '#15803D', // From MapView createAlertMarkerElement (resolved alerts)
-          forest: '#264653', // For CardTitle text
           teal: '#2A9D8F', // For CardDescription text
+          test:'#DBDBDB'
         },
       },
       keyframes: {
