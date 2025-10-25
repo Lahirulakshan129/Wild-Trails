@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import Sidebar from "../components/adminDashboard/Sidebar";
 import Header from "../components/adminDashboard/Header";
@@ -13,7 +14,7 @@ const SightingSummary = lazy(() =>
   import("../components/adminDashboard/SightingSummary")
 );
 const DriverManagement = lazy(() =>
-    import("../components/adminDashboard/DriverManagement.jsx")
+  import("../components/adminDashboard/DriverManagement.jsx")
 );
 import AddDriverForm from "../components/adminDashboard/AddDriverForm";
 import {
@@ -35,9 +36,11 @@ import {
 } from "lucide-react";
 const token = localStorage.getItem("token");
 
+
 const AdminDashboard = () => {
   const [activeSection, setActiveSection] = useState("overview");
   const [admin, setAdmin] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedAdmin = localStorage.getItem("admin");
@@ -133,7 +136,8 @@ const AdminDashboard = () => {
                 Welcome, {admin?.name || "Admin"}!
               </h2>
               <p className="text-gray-600">
-                Manage your wildlife safari operations efficiently from this dashboard.
+                Manage your wildlife safari operations efficiently from this
+                dashboard.
               </p>
             </div>
 
@@ -141,7 +145,10 @@ const AdminDashboard = () => {
               <button className="bg-safari-forest text-white px-4 py-2 rounded hover:bg-safari-leaf transition">
                 Driver Management
               </button>
-              <button className="bg-safari-forest text-white px-4 py-2 rounded hover:bg-safari-leaf transition">
+              <button
+                onClick={() => navigate("/adminDashboard/packages")}
+                className="bg-safari-forest text-white px-4 py-2 rounded hover:bg-safari-leaf transition"
+              >
                 Package Management
               </button>
             </div>
@@ -258,10 +265,11 @@ const AdminDashboard = () => {
               </div>
             </section>
 
-            {/* Booking Management Section
             <section id="bookings" className="pt-4">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-playfair font-bold text-safari-forest">Booking Management</h2>
+                <h2 className="text-xl font-playfair font-bold text-safari-forest">
+                  Booking Management
+                </h2>
                 <div className="flex space-x-2">
                   <Button size="sm" variant="outline" className="h-9">
                     <CheckCircleIcon className="h-4 w-4 mr-1" />
@@ -277,7 +285,7 @@ const AdminDashboard = () => {
                   </Button>
                 </div>
               </div>
-              
+
               <div className="space-y-1">
                 {MOCK_BOOKINGS.map((booking) => (
                   <BookingItem
@@ -292,7 +300,7 @@ const AdminDashboard = () => {
                   />
                 ))}
               </div>
-            </section> */}
+            </section>
 
             {/* Reviews and Loyalty */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4">
@@ -312,7 +320,6 @@ const AdminDashboard = () => {
 
             {/* Driver Management Section */}
             <DriverManagement></DriverManagement>
-
 
             {/* Sighting Summary */}
             <section id="summary" className="pt-4 bg-white">

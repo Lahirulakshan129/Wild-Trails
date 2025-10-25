@@ -232,9 +232,7 @@ const SightingSummary = () => {
         ? `${BACKEND_URL}/api/sightings/month?year=${selectedMonth.getFullYear()}&month=${
             selectedMonth.getMonth() + 1
           }`
-        : `${BACKEND_URL}/api/sightings/last-30-days`,
-      setSightingsData
-    );
+        : `${BACKEND_URL}/api/sightings/last-30-days`, setSightingsData);
   }, [fetchData, viewMode, selectedMonth]);
 
   // Loading and error states

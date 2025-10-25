@@ -114,7 +114,6 @@ public class AnimalSightingService {
 
     public List<SightingTimeDTO> getSightingsByTimeDistribution(String animalName) {
         LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
-
         List<AnimalSighting> sightings = repository.findSightingsByAnimalAndHourRange(animalName, thirtyDaysAgo);
 
         return sightings.stream()

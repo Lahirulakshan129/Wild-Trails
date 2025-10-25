@@ -100,8 +100,8 @@ public class AnimalSightingController {
     }
 
     @GetMapping("/time-distribution")
-    public ResponseEntity<List<SightingTimeDTO>> getSightingsByTimeDistribution(
-            @RequestParam("animal") String animalName) {
-        return ResponseEntity.ok(service.getSightingsByTimeDistribution(animalName));
+    public ResponseEntity<List<SightingTimeDTO>> getSightingsByTimeDistribution(@RequestParam String animal) {
+        List<SightingTimeDTO> dtos = service.getSightingsByTimeDistribution(animal);
+        return ResponseEntity.ok(dtos);
     }
 }

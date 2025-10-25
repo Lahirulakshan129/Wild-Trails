@@ -69,7 +69,7 @@ export default {
           brown: '#78552b', // From original config
           gold: '#d9b95c', // From original config
           cream: '#fcf9f2', // From original config
-          charcoal: '#333333', // From original config
+          charcoal: '#8e8e8e', // From original config
           'light-green': '#4a7a4a', // From original config
           sand: '#e6d7b8', // From original config and used in Header as safari-sand
           black: '#111111', // From original config

@@ -29,12 +29,13 @@ const kumanaParkBoundary = [
   [6.330, 81.780], [6.300, 81.740], [6.285, 81.690]
 ];
 
+// Updated demo coordinates within Kumana Park boundaries
 const demoCoordinates = [
-  { lat: 6.547939, lng: 81.688521 },
-  { lat: 6.571841, lng: 81.713383 },
-  { lat: 6.566790, lng: 81.700198 },
-  { lat: 6.474983, lng: 81.654569 },
-  { lat: 6.515333, lng: 81.628845 },
+  { lat: 6.350, lng: 81.470 },
+  { lat: 6.400, lng: 81.500 },
+  { lat: 6.450, lng: 81.600 },
+  { lat: 6.500, lng: 81.700 },
+  { lat: 6.600, lng: 81.650 },
 ];
 
 const getLocalDateTimeString = () => {
@@ -42,6 +43,24 @@ const getLocalDateTimeString = () => {
   const offset = date.getTimezoneOffset();
   const localDate = new Date(date.getTime() - offset * 60000);
   return localDate.toISOString().slice(0, 16);
+};
+
+// Ray casting algorithm for point-in-polygon detection
+const isPointInPolygon = (point, polygon) => {
+  const [lat, lng] = point;
+  let inside = false;
+
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const [latI, lngI] = polygon[i];
+    const [latJ, lngJ] = polygon[j];
+
+    const intersect = ((lngI > lng) !== (lngJ > lng)) &&
+        (lat < ((latJ - latI) * (lng - lngI)) / (lngJ - lngI) + latI);
+
+    if (intersect) inside = !inside;
+  }
+
+  return inside;
 };
 
 const AnimalSightingForm = ({ onSubmit }) => {
@@ -58,18 +77,22 @@ const AnimalSightingForm = ({ onSubmit }) => {
     { value: "Tiger", label: "Tiger" },
     { value: "Sloth Bear", label: "Sloth Bear" },
     { value: "Elephant", label: "Elephant" },
-    { value: "Rare Animal", label: "Rare Animal" },
+
   ];
 
   const isWithinKumanaPolygon = (lat, lng) => {
-    if (!window.google?.maps?.geometry) return false;
+    // First try using Google Maps geometry if available
+    if (window.google?.maps?.geometry) {
+      const point = new window.google.maps.LatLng(lat, lng);
+      const polygon = new window.google.maps.Polygon({
+        paths: kumanaParkBoundary.map(([lat, lng]) => new window.google.maps.LatLng(lat, lng)),
+      });
 
-    const point = new window.google.maps.LatLng(lat, lng);
-    const polygon = new window.google.maps.Polygon({
-      paths: kumanaParkBoundary.map(([lat, lng]) => new window.google.maps.LatLng(lat, lng)),
-    });
+      return window.google.maps.geometry.poly.containsLocation(point, polygon);
+    }
 
-    return window.google.maps.geometry.poly.containsLocation(point, polygon);
+    // Fallback to our own ray casting implementation
+    return isPointInPolygon([lat, lng], kumanaParkBoundary);
   };
 
   const getRandomDemoLocation = () => {
@@ -96,14 +119,14 @@ const AnimalSightingForm = ({ onSubmit }) => {
     if (navigator.geolocation) {
       setIsLoadingLocation(true);
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          processLocation(latitude, longitude);
-        },
-        (error) => {
-          console.error("Error fetching location:", error);
-          setIsLoadingLocation(false);
-        }
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            processLocation(latitude, longitude);
+          },
+          (error) => {
+            console.error("Error fetching location:", error);
+            setIsLoadingLocation(false);
+          }
       );
     } else {
       console.warn("Geolocation is not supported by this browser.");
@@ -143,9 +166,9 @@ const AnimalSightingForm = ({ onSubmit }) => {
         const errorData = await response.json();
         toast.error(errorData.message || "Something went wrong");
         return;
-    }
-      const data1 = await response.json();
-      console.log("Sighting submitted:", data1);
+      }
+      const data = await response.json();
+      console.log("Sighting submitted:", data);
 
       if (onSubmit && typeof onSubmit === "function") {
         await onSubmit(newSighting);
@@ -159,7 +182,6 @@ const AnimalSightingForm = ({ onSubmit }) => {
       setIsSubmitting(false);
     }
   };
-
   return (
     <div className="p-3 rounded-lg border border-emerald-100 bg-emerald-50 hover:bg-emerald-50/80 mb-3">
       <div className="flex items-start">

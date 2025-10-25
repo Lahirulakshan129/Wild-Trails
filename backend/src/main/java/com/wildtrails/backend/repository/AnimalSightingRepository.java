@@ -46,5 +46,4 @@ public interface AnimalSightingRepository extends JpaRepository<AnimalSighting, 
             @Param("startDate") LocalDateTime startDate
     );
 
-
 }

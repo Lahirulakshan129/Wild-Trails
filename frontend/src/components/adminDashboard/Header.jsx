@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  BellIcon,
-  CalendarIcon,
-  UserIcon,
-  LogOutIcon,
-} from "lucide-react";
+import { BellIcon, CalendarIcon, UserIcon, LogOutIcon } from "lucide-react";
 import { Button } from "@/components/ui/adminDashboard-ui/Button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/adminDashboard-ui/Avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/adminDashboard-ui/Avatar";
 import { Badge } from "@/components/ui/adminDashboard-ui/Badge";
 
 const Header = ({ title, breadcrumbs }) => {
@@ -16,9 +15,28 @@ const Header = ({ title, breadcrumbs }) => {
 
   const handleLogout = () => {
     // Clear local/session storage
-    localStorage.removeItem("token"); 
+    localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/");
+  };
+
+  const handleClick = (crumb) => {
+    switch (crumb) {
+      case "Dashboard":
+        navigate("/adminDashboard");
+        break;
+      case "Packages":
+        navigate("/adminDashboard/packages");
+        break;
+      case "Bookings":
+        navigate("/adminDashboard/bookings");
+        break;
+      case "Reports":
+        navigate("/adminDashboard/reports");
+        break;
+      default:
+        break;
+    }
   };
 
   return (
@@ -29,7 +47,10 @@ const Header = ({ title, breadcrumbs }) => {
           <div className="flex items-center space-x-2 text-safari-sand mb-1">
             {breadcrumbs.map((crumb, index) => (
               <div key={index} className="flex items-center">
-                <span className="text-sm hover:text-safari-orange cursor-pointer">
+                <span
+                  className="text-sm hover:text-safari-orange cursor-pointer"
+                  onClick={() => handleClick(crumb)}
+                >
                   {crumb}
                 </span>
                 {index < breadcrumbs.length - 1 && (
@@ -45,7 +66,11 @@ const Header = ({ title, breadcrumbs }) => {
 
         {/* Right: Buttons & Avatar */}
         <div className="flex items-center space-x-4">
-          <Button variant="outline" size="sm" className="text-safari-forest border-gray-200">
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-safari-forest border-gray-200"
+          >
             <CalendarIcon className="mr-2 h-4 w-4" />
             Today: May 26, 2025
           </Button>
@@ -72,7 +97,9 @@ const Header = ({ title, breadcrumbs }) => {
               </AvatarFallback>
             </Avatar>
             <div className="hidden md:block">
-              <p className="text-sm font-medium text-safari-forest">Park Admin</p>
+              <p className="text-sm font-medium text-safari-forest">
+                Park Admin
+              </p>
               <p className="text-xs text-gray-500">admin@kumanapark.com</p>
             </div>
           </div>
