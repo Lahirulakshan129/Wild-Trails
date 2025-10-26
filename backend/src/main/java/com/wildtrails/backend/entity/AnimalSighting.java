@@ -33,4 +33,5 @@ public class AnimalSighting {
     @ManyToOne
     @JoinColumn(name = "driver_id", nullable = false) // Changed from "id"
     private Driver submittedBy;
+
 }

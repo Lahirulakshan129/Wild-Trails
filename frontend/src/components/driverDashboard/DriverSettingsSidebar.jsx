@@ -1,19 +1,38 @@
-import { useState, useRef } from "react";
-import { X, Camera, Bell, Palette ,Clock} from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { X, Camera, Bell, Palette, Clock } from "lucide-react";
+import toast from "react-hot-toast";
 
-export default function DriverSettingsSidebar({ isOpen, onClose,user }) {
+export default function DriverSettingsSidebar({ isOpen, onClose }) {
   const [availability, setAvailability] = useState(true);
-  const [notifications, setNotifications] = useState({
-    email: true,
-    push: false,
-  });
-  const [theme, setTheme] = useState("light");
+  const [notifications, setNotifications] = useState({ email: true, push: false });
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [photo, setPhoto] = useState(null);
+  const [preview, setPreview] = useState("/driver-placeholder.png");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [vehicleType, setVehicleType] = useState("");
+  const [seatingCapacity, setSeatingCapacity] = useState(0);
+
   const fileInputRef = useRef();
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    if (isOpen) {
+      fetch(`${backendUrl}/api/driver/get_loggedin`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.photo_url) setPreview(`${backendUrl}${data.photo_url}`);
+          if (typeof data.isAvailable === "boolean") setAvailability(data.isAvailable);
+          if (data.vehicle_type) setVehicleType(data.vehicle_type);
+          if (data.seating_capacity) setSeatingCapacity(data.seating_capacity);
+        })
+        .catch((err) => console.error("Failed to fetch driver info", err));
+    }
+  }, [isOpen, backendUrl, token]);
 
   const handlePasswordChange = () => {
     if (password.length < 8) {
@@ -31,8 +50,9 @@ export default function DriverSettingsSidebar({ isOpen, onClose,user }) {
   const handlePhotoUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setPhoto(file);
       const reader = new FileReader();
-      reader.onloadend = () => setPhoto(reader.result);
+      reader.onloadend = () => setPreview(reader.result);
       reader.readAsDataURL(file);
     }
   };
@@ -42,16 +62,76 @@ export default function DriverSettingsSidebar({ isOpen, onClose,user }) {
     setShowConfirmModal(true);
   };
 
-  const confirmSave = () => {
-    // Simulate API call to save settings
-    console.log("Saving settings:", { availability, notifications, theme, password, photo });
-    setShowConfirmModal(false);
-    setPassword("");
-    setConfirmPassword("");
-    // Optionally close sidebar after saving
-    onClose();
-  };
-
+  const confirmSave = async () => {
+    try {
+      // 1. Upload photo
+      if (photo instanceof File) {
+        const formData = new FormData();
+        formData.append("file", photo);
+  
+        const res = await fetch(`${backendUrl}/api/driver/update/photo`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData,
+        });
+  
+        if (!res.ok) throw new Error("Photo upload failed");
+        const photoUrl = await res.text();
+        setPreview(`${backendUrl}${photoUrl}`);
+      }
+  
+      // 2. Update settings
+      const settingsPayload = {
+        isAvailable: availability,
+        vehicle_type: vehicleType,
+        seating_capacity: seatingCapacity,
+      };
+  
+      const settingsRes = await fetch(`${backendUrl}/api/driver/update/settings`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(settingsPayload),
+      });
+  
+      if (!settingsRes.ok) throw new Error("Settings update failed");
+  
+      // 3. Update password (if provided)
+      if (password) {
+        const passwordPayload = {
+          newPassword: password,
+          confirmPassword: confirmPassword,
+        };
+  
+        const passwordRes = await fetch(`${backendUrl}/api/driver/change-password`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(passwordPayload),
+        });
+  
+        if (!passwordRes.ok) {
+          const errorText = await passwordRes.text();
+          throw new Error(`Password update failed: ${errorText}`);
+        }
+      }
+  
+      toast.success("Settings updated successfully!");
+      setShowConfirmModal(false);
+      setPassword("");
+      setConfirmPassword("");
+      onClose();
+    } catch (err) {
+      console.error("Error saving settings:", err.message);
+      toast.error(err.message || "An error occurred while saving your settings.");
+    }
+  
+};
+    
   return (
     <>
       {/* Backdrop */}
@@ -83,30 +163,20 @@ export default function DriverSettingsSidebar({ isOpen, onClose,user }) {
         </div>
 
         <div className="p-6 space-y-6 text-gray-800">
-          {/* Profile Photo Upload */}
+          {/* Profile Photo */}
           <div>
             <h3 className="font-semibold text-green-900 mb-3 flex items-center gap-2">
               <Camera className="h-5 w-5" /> Profile Photo
             </h3>
             <div className="flex items-center gap-4">
-              <img
-                src={photo || "/driver-placeholder.png"}
-                alt="Profile preview"
-                className="w-16 h-16 rounded-full object-cover border-2 border-green-200"
-              />
+              <img src={preview} alt="Profile" className="w-16 h-16 rounded-full object-cover border-2 border-green-200" />
               <button
                 onClick={() => fileInputRef.current.click()}
-                className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 transition text-sm"
+                className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm"
               >
                 Upload Photo
               </button>
-              <input
-                type="file"
-                accept="image/*"
-                ref={fileInputRef}
-                className="hidden"
-                onChange={handlePhotoUpload}
-              />
+              <input type="file" accept="image/*" ref={fileInputRef} className="hidden" onChange={handlePhotoUpload} />
             </div>
           </div>
 
@@ -126,48 +196,30 @@ export default function DriverSettingsSidebar({ isOpen, onClose,user }) {
             </label>
           </div>
 
-          {/* Notification Preferences */}
+          {/* Notifications */}
+          {/* Vehicle Info */}
           <div>
-            <h3 className="font-semibold text-green-900 mb-3 flex items-center gap-2">
-              <Bell className="h-5 w-5" /> Notifications
-            </h3>
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                className="form-checkbox h-5 w-5 text-green-600 rounded"
-                checked={notifications.email}
-                onChange={() => setNotifications((prev) => ({ ...prev, email: !prev.email }))}
-              />
-              <span className="text-sm font-medium">Email Notifications</span>
-            </label>
-            <label className="flex items-center gap-3 cursor-pointer mt-2">
-              <input
-                type="checkbox"
-                className="form-checkbox h-5 w-5 text-green-600 rounded"
-                checked={notifications.push}
-                onChange={() => setNotifications((prev) => ({ ...prev, push: !prev.push }))}
-              />
-              <span className="text-sm font-medium">Push Notifications</span>
-            </label>
-          </div>
-
-          {/* Theme Selection */}
-          <div>
-            <h3 className="font-semibold text-green-900 mb-3 flex items-center gap-2">
-              <Palette className="h-5 w-5" /> Theme
-            </h3>
-            <select
-              value={theme}
-              onChange={(e) => setTheme(e.target.value)}
+            <h3 className="font-semibold text-green-900 mb-3">Update Vehicle Info</h3>
+            <label className="block text-sm font-medium mb-1">Vehicle Type</label>
+            <input
+              type="text"
+              value={vehicleType}
+              onChange={(e) => setVehicleType(e.target.value)}
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-green-500 mb-4"
+              placeholder="e.g., Jeep"
+            />
+            <label className="block text-sm font-medium mb-1">Seating Capacity</label>
+            <input
+              type="number"
+              min="1"
+              value={seatingCapacity}
+              onChange={(e) => setSeatingCapacity(Number(e.target.value))}
               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-green-500"
-            >
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-              <option value="system">System</option>
-            </select>
+              placeholder="Enter seating capacity"
+            />
           </div>
 
-          {/* Change Password */}
+          {/* Password */}
           <div>
             <h3 className="font-semibold text-green-900 mb-3">Change Password</h3>
             <div className="space-y-3">

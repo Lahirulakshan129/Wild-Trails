@@ -1,5 +1,6 @@
 package com.wildtrails.backend.service;
 
+import com.wildtrails.backend.entity.Customer;
 import com.wildtrails.backend.entity.Role;
 import com.wildtrails.backend.entity.User;
 import com.wildtrails.backend.repository.UserRepository;
@@ -32,18 +33,27 @@ public class CustomUserDetailsService implements UserDetailsService {
             .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
         return new CustomUserDetails(user);
     }
-    
 
-    public User loadOrCreateCustomer(String email, String name, int uid) {
+
+    public User loadOrCreateCustomer(String email, String name) {
         return userRepository.findByEmail(email).orElseGet(() -> {
-            User newUser = User.builder()
-                    .email(email)
-                    .name(name)
-                    .id(uid)
-                    .role(Role.CUSTOMER) 
-                    .password("defaultPassword") 
-                    .build();
-            return userRepository.save(newUser);
+            User newUser = new User();
+            newUser.setEmail(email);
+            newUser.setName(name != null ? name : "Firebase User");
+            newUser.setPassword("defaultPassword"); // fallback
+            newUser.setRole(Role.CUSTOMER);
+
+            Customer customer = new Customer();
+            customer.setUser(newUser);
+            customer.setLoyalty_points(0);
+            customer.setPhoto_url(null);
+            customer.setPhone_number(null);
+            customer.setAddress(null);
+
+            newUser.setCustomer(customer);
+
+            return userRepository.save(newUser); // cascade saves both
         });
     }
+
 }

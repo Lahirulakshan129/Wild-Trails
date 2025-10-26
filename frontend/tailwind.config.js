@@ -10,7 +10,7 @@ export default {
       sans: ['Source Sans 3', 'ui-sans-serif', 'system-ui'],
       serif: ['Playfair Display', 'ui-serif', 'Georgia'],
       body: ['Lora', 'ui-serif', 'Georgia'],
-      caveat: ['Caveat', 'cursive'], // Added here (no duplicate 'theme' needed)
+      caveat: ['Caveat', 'cursive'],
       aref: ['Aref Ruqaa', 'ui-serif', 'Georgia'],
     },
     extend: {
@@ -65,15 +65,24 @@ export default {
           '5': 'hsl(var(--chart-5))',
         },
         safari: {
-          green: '#A0DA83',
-          brown: '#78552b',
-          gold: '#d9b95c',
-          cream: '#fcf9f2',
-          charcoal: '#333333',
-          'light-green': '#4a7a4a',
-          sand: '#e6d7b8',
-          black: '#111111',
-          
+          green: '#A0DA83', // From original config
+          brown: '#78552b', // From original config
+          gold: '#d9b95c', // From original config
+          cream: '#fcf9f2', // From original config
+          charcoal: '#8e8e8e', // From original config
+          'light-green': '#4a7a4a', // From original config
+          sand: '#e6d7b8', // From original config and used in Header as safari-sand
+          black: '#111111', // From original config
+          orange: '#F4A261', // From MapView getAnimalColor (bird) and Header buttons/badge
+          forest: '#264653', // From MapView getAnimalColor (bear) and Header text
+          leopard: '#E9C46A', // From MapView getAnimalColor (leopard)
+          default: '#E76F51', // From MapView getAnimalColor (default)
+          'alert-active-bg': '#FECACA', // From MapView createAlertMarkerElement (active alerts)
+          'alert-active-fg': '#B91C1C', // From MapView createAlertMarkerElement (active alerts)
+          'alert-resolved-bg': '#BBF7D0', // From MapView createAlertMarkerElement (resolved alerts)
+          'alert-resolved-fg': '#15803D', // From MapView createAlertMarkerElement (resolved alerts)
+          teal: '#2A9D8F', // For CardDescription text
+          test:'#DBDBDB'
         },
       },
       keyframes: {
@@ -95,5 +104,5 @@ export default {
   plugins: [
     require('tailwindcss-animate'),
     require('tailwind-scrollbar-hide'),
-  ], 
+  ],
 }

@@ -1,6 +1,8 @@
 package com.wildtrails.backend.service;
 
+import com.wildtrails.backend.dto.AnimalHotspotDTO;
 import com.wildtrails.backend.dto.AnimalSightingDTO;
+import com.wildtrails.backend.dto.SightingTimeDTO;
 import com.wildtrails.backend.entity.AnimalSighting;
 import com.wildtrails.backend.entity.Driver;
 import com.wildtrails.backend.entity.Location;
@@ -12,8 +14,11 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
 import java.time.ZoneId;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class AnimalSightingService {
@@ -83,5 +88,36 @@ public class AnimalSightingService {
             throw new RuntimeException("Failed to save sighting: " + e.getMessage(), e);
         }
     }
-    
+
+    public List<AnimalSighting> getSightingsAfter(LocalDateTime time) {
+        return repository.findByDateTimeAfter(time);
+    }
+
+    public void deleteASighting(Long id) {
+        if (repository.existsById(id)) {
+            repository.deleteById(id);
+        } else {
+            throw new RuntimeException("Animal sighting not found with ID: " + id);
+        }
+    }
+    public List<AnimalHotspotDTO> getAnimalHotspots() {
+        List<Object[]> results = repository.findCurrentHotspots();
+        return results.stream()
+                .map(result -> new AnimalHotspotDTO(
+                        (String) result[0],  // animal_name
+                        ((Number) result[1]).doubleValue(),  // lat (BigDecimal to Double)
+                        ((Number) result[2]).doubleValue(),  // lng (BigDecimal to Double)
+                        ((Number) result[3]).longValue()    // sightings_count
+                ))
+                .toList();
+    }
+
+    public List<SightingTimeDTO> getSightingsByTimeDistribution(String animalName) {
+        LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
+        List<AnimalSighting> sightings = repository.findSightingsByAnimalAndHourRange(animalName, thirtyDaysAgo);
+
+        return sightings.stream()
+                .map(s -> new SightingTimeDTO(s.getAnimalName(), s.getDateTime()))
+                .collect(Collectors.toList());
+    }
 }

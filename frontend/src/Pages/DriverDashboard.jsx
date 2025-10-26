@@ -114,29 +114,30 @@ export default function DriverDashboard() {
   const handleSendSOS = async (location) => {
     setIsSendingSOS(true);
     try {
-      const position = await new Promise((resolve, reject) =>
-        navigator.geolocation.getCurrentPosition(resolve, reject)
-      );
-
       const token = localStorage.getItem("token");
-
-      const response = await fetch("http://localhost:8080/api/driver/sos", {
+  
+      const body = {
+        latitude: location.lat,
+        longitude: location.lng,
+        details: location.note || "",
+      };
+      
+      console.log("Sending SOS payload:", body);
+      
+      const response = await fetch("http://localhost:8080/api/sos", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          lat: location.lat,
-          lng: location.lng,
-        }),
+        body: JSON.stringify(body),
       });
+      
+      
+  
       if (response.ok) {
         toast.success("SOS alert sent successfully! Rangers will contact you soon.");
-        
-      }
-
-      if (!response.ok) {
+      } else {
         throw new Error("SOS alert failed");
       }
     } catch (error) {
@@ -146,6 +147,8 @@ export default function DriverDashboard() {
       setIsSendingSOS(false);
     }
   };
+  
+  
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-0 relative">

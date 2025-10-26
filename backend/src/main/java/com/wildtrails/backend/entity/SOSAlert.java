@@ -16,9 +16,14 @@ public class SOSAlert {
 
     private double latitude;
     private double longitude;
+    
+    private String details;
 
     private LocalDateTime timestamp;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean isSolved = false;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id", nullable = false)
     private Driver driver;

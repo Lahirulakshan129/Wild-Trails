@@ -8,5 +8,10 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "@stomp/stompjs": "^7.1.1",
+    "react-time-picker": "^8.0.2",
+    "sockjs-client": "^1.6.1"
+  }
 }

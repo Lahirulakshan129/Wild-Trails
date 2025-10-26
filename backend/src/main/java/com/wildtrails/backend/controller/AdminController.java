@@ -3,6 +3,7 @@ package com.wildtrails.backend.controller;
 import com.wildtrails.backend.dto.RegisterRequest;
 import com.wildtrails.backend.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,15 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/register-driver")
     public ResponseEntity<?> registerDriver(@RequestBody RegisterRequest request) {
-    authService.registerDriver(request); 
-    return ResponseEntity.ok("Driver registered successfully.");
-}
+
+        try {
+            authService.registerDriver(request);
+            return ResponseEntity.ok("Driver registered successfully.");
+        } catch (Exception e) {
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Something went wrong: " );
+        }
+    }
+
 }

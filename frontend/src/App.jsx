@@ -6,7 +6,9 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 import Unauthorized from './Pages/util/UnauthorizedPage';
 import AdminDashboard from './Pages/AdminDashboard';
 import UserDashboard from './Pages/UserDashboard/UserDashboard';
+import AdminDashboardPackages from './Pages/AdminDashboard/Packages';
 import { Toaster } from 'react-hot-toast';
+
 
 function App() {
   console.log("App component rendered");
@@ -26,12 +28,20 @@ function App() {
       />
       <Route path="/review" element={<Review />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
-      <Route path="/userDashboard" element={<UserDashboard />} />
+      <Route path="/customerDashboard" element={<UserDashboard />} />
       <Route
         path="/AdminDashboard"
         element={
           <ProtectedRoute requiredRole="ADMIN">
             <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/AdminDashboard/Packages"
+        element={
+          <ProtectedRoute requiredRole="ADMIN">
+            <AdminDashboardPackages/>
           </ProtectedRoute>
         }
       />
