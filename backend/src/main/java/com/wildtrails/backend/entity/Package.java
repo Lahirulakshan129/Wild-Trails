@@ -29,12 +29,10 @@ public class Package {
     // --- Safari-specific fields ---
     private Integer maxPeople;
     private String time;
-    private String duration;
 
     // --- Activity-specific fields ---
     @Column(length = 1000)
     private String details;
-    private String difficulty;
     private String location;
 
     // --- Hire-specific fields ---

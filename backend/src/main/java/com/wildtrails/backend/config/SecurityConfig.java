@@ -42,8 +42,6 @@ public class SecurityConfig {
                 .requestMatchers("/api/sightings", "/api/sightings/**").hasAnyRole("DRIVER", "ADMIN")
                 .requestMatchers("/ws-sightings/**", "/ws/**", "/ws-sightings/info/**").permitAll()
                 .requestMatchers("/uploads/**").permitAll()
-                
-
                 .anyRequest().authenticated()
             )
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

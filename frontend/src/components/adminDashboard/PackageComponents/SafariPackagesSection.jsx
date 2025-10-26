@@ -19,11 +19,11 @@ const SafariPackagesSection = ({ packages, onAdd, onEdit, onDelete }) => {
       <div className="flex flex-wrap justify-center gap-8">
         {packages.map((pkg) => (
           <Card
-            key={pkg.id}
+            key={pkg.packageID}
             className="w-full sm:w-64 md:w-72 overflow-hidden shadow-md border border-safari-forest/20 rounded-2xl transition-transform transform hover:scale-[1.02]"
           >
             <img
-              src={pkg.image}
+              src={`http://localhost:8080${pkg.imageUrl}`}
               alt={pkg.name}
               className="h-40 w-full object-cover"
             />
@@ -51,7 +51,7 @@ const SafariPackagesSection = ({ packages, onAdd, onEdit, onDelete }) => {
                 <Button
                   size="sm"
                   variant="destructive"
-                  onClick={() => onDelete("safari", pkg.id)}
+                  onClick={() => onDelete("safari",  pkg.packageID)}
                 >
                   Delete
                 </Button>
