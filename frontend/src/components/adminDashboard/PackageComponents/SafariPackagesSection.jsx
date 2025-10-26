@@ -29,7 +29,7 @@ const SafariPackagesSection = ({ packages, onAdd, onEdit, onDelete }) => {
             />
             <CardHeader className="pb-2">
               <CardTitle className="font-playfair text-safari-forest text-lg">
-                {pkg.name}
+                {pkg.packageName}
               </CardTitle>
               <CardDescription>{pkg.time}</CardDescription>
             </CardHeader>
@@ -38,7 +38,7 @@ const SafariPackagesSection = ({ packages, onAdd, onEdit, onDelete }) => {
                 Max People: {pkg.maxPeople}
               </p>
               <p className="text-safari-forest font-semibold text-base mb-2">
-                Rs. {pkg.cost} / Person
+                Rs. {pkg.packagePrice} / Person
               </p>
               <div className="flex justify-end mt-3 gap-2">
                 <Button

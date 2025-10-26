@@ -31,7 +31,7 @@ public class Package {
     private String time;
 
     // --- Activity-specific fields ---
-    @Column(length = 1000)
+    @Column(length = 2000)
     private String details;
     private String location;
 

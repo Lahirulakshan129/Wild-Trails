@@ -30,7 +30,7 @@ const HirePackagesSection = ({ packages, onAdd, onEdit, onDelete }) => {
             </CardHeader>
             <CardContent>
               <p className="text-safari-forest font-semibold text-base mt-1">
-                Rs. {pkg.costPerDay} / Day
+                Rs. {pkg.packagePrice} / Day
               </p>
               {pkg.capacity && (
                 <p className="text-gray-600 text-sm mt-1">

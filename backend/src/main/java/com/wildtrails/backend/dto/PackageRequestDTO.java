@@ -14,4 +14,6 @@ public class PackageRequestDTO {
     private String vehicleType;     // hire
     private String tourName;        // hire
     private Integer capacity;       // hire
+    private String time;
+    private String location;
 }

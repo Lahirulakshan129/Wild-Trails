@@ -23,7 +23,7 @@ const ActivityPackagesSection = ({ packages, onAdd, onEdit, onDelete }) => {
             className="w-full sm:w-64 md:w-72 overflow-hidden shadow-lg border border-safari-leaf/30 rounded-2xl transition-transform transform hover:scale-[1.02]"
           >
             <img
-              src={pkg.image}
+              src={`http://localhost:8080${pkg.imageUrl}`}
               alt={pkg.name}
               className="h-48 w-full object-cover"
             />
@@ -46,7 +46,7 @@ const ActivityPackagesSection = ({ packages, onAdd, onEdit, onDelete }) => {
                 </p>
               )}
               <p className="text-safari-forest font-semibold text-base mt-2">
-                Rs. {pkg.cost}
+                Rs. {pkg.packagePrice} / Per Person
               </p>
               <div className="flex justify-end mt-4 gap-2">
                 <Button 

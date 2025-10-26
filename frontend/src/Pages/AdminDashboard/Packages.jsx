@@ -59,16 +59,18 @@ const PackageManager = () => {
       package: {
         packageID: null,
         packageName: "",
-        packagePrice: 0,
+        packagePrice: null, // Changed to null
         packageType: type.toUpperCase(),
         imageUrl: "",
         details: "",
-        maxPeople: 0,
+        maxPeople: null, // Changed to null
         vehicleType: "",
         tourName: "",
-        capacity: 0,
-        time: "", // For Safari
-        location: "", // For Activity
+        capacity: null, // Changed to null
+        time: "",
+        startTime: "07:00",
+        endTime: "16:00",
+        location: "", 
       },
     });
   };
@@ -88,15 +90,17 @@ const PackageManager = () => {
     let errors = [];
     if (type === "safari") {
       if (!pkg.packageName) errors.push("Package name is required.");
-      if (pkg.packagePrice <= 0) errors.push("Price must be greater than 0.");
+      if (!pkg.packagePrice || pkg.packagePrice <= 0) errors.push("Price must be greater than 0.");
+      if (!pkg.startTime || !pkg.endTime) errors.push("Start and end times are required.");
+      else if (pkg.startTime >= pkg.endTime) errors.push("End time must be after start time.");
     } else if (type === "activity") {
       if (!pkg.packageName) errors.push("Package name is required.");
-      if (pkg.packagePrice <= 0) errors.push("Price must be greater than 0.");
-      if (!pkg.location) errors.push("Location is required."); // Added validation for location
+      if (!pkg.packagePrice || pkg.packagePrice <= 0) errors.push("Price must be greater than 0.");
+      if (!pkg.location) errors.push("Location is required.");
     } else if (type === "hire") {
       if (!pkg.vehicleType) errors.push("Vehicle type is required.");
       if (!pkg.tourName) errors.push("Tour name is required.");
-      if (pkg.packagePrice <= 0) errors.push("Price per day must be greater than 0.");
+      if (!pkg.packagePrice || pkg.packagePrice <= 0) errors.push("Price per day must be greater than 0.");
     }
 
     if (errors.length > 0) {
@@ -115,11 +119,11 @@ const PackageManager = () => {
     if (type === "safari") {
       formData.append("maxPeople", pkg.maxPeople || 0);
       formData.append("details", pkg.details || "");
-      formData.append("time", pkg.time || "");
+      formData.append("time", `${pkg.startTime}-${pkg.endTime}`);
     } else if (type === "activity") {
       formData.append("maxPeople", pkg.maxPeople || 0);
       formData.append("details", pkg.details || "");
-      formData.append("location", pkg.location || ""); // Include location for Activity
+      formData.append("location", pkg.location || "");
     } else if (type === "hire") {
       formData.append("vehicleType", pkg.vehicleType || "");
       formData.append("tourName", pkg.tourName || "");
@@ -159,6 +163,9 @@ const PackageManager = () => {
       return;
     }
 
+    // Parse time field (e.g., "07:00-16:00") into startTime and endTime
+    const [startTime, endTime] = pkg.time ? pkg.time.split("-") : ["07:00", "16:00"];
+
     setSelectedFile(null);
     setError(null);
     setEditModal({
@@ -167,16 +174,18 @@ const PackageManager = () => {
       package: {
         packageID: pkg.packageID,
         packageName: pkg.packageName || "",
-        packagePrice: pkg.packagePrice || 0,
+        packagePrice: pkg.packagePrice || null,
         packageType: pkg.packageType || type.toUpperCase(),
         imageUrl: pkg.imageUrl || "",
         details: pkg.details || "",
-        maxPeople: pkg.maxPeople || 0,
+        maxPeople: pkg.maxPeople || null,
         vehicleType: pkg.vehicleType || "",
         tourName: pkg.tourName || "",
-        capacity: pkg.capacity || 0,
-        time: pkg.time || "", // For Safari
-        location: pkg.location || "", // For Activity
+        capacity: pkg.capacity || null,
+        time: pkg.time || "",
+        startTime: startTime || "07:00",
+        endTime: endTime || "16:00",
+        location: pkg.location || "",
         imageFile: null,
       },
     });
@@ -233,8 +242,8 @@ const PackageManager = () => {
         vehicleType: pkg.vehicleType,
         tourName: pkg.tourName,
         capacity: pkg.capacity,
-        time: pkg.time, // For Safari
-        location: pkg.location, // For Activity
+        time: pkg.time,
+        location: pkg.location,
       }));
 
       setSafariPackages(mappedData.filter((p) => p.packageType === "SAFARI"));
@@ -245,6 +254,16 @@ const PackageManager = () => {
       console.error("Error fetching packages:", err);
       setError("Failed to fetch packages. Please try again.");
     }
+  };
+
+  // Handler to strip leading zeros and ensure valid number
+  const handleNumberChange = (value, field) => {
+    // Remove leading zeros and convert to number, allow empty string
+    const cleanedValue = value === "" ? null : Number(value.replace(/^0+/, "") || 0);
+    setEditModal({
+      ...editModal,
+      package: { ...editModal.package, [field]: cleanedValue },
+    });
   };
 
   return (
@@ -335,14 +354,11 @@ const PackageManager = () => {
                         <Input
                           id="packagePrice"
                           type="number"
-                          value={editModal.package.packagePrice}
-                          onChange={(e) =>
-                            setEditModal({
-                              ...editModal,
-                              package: { ...editModal.package, packagePrice: parseFloat(e.target.value) || 0 },
-                            })
-                          }
+                          value={editModal.package.packagePrice ?? ""}
+                          onChange={(e) => handleNumberChange(e.target.value, "packagePrice")}
                           className="col-span-3"
+                          min="0"
+                          step="0.01"
                         />
                       </div>
                       <div className="grid grid-cols-4 items-center gap-4">
@@ -352,14 +368,10 @@ const PackageManager = () => {
                         <Input
                           id="maxPeople"
                           type="number"
-                          value={editModal.package.maxPeople}
-                          onChange={(e) =>
-                            setEditModal({
-                              ...editModal,
-                              package: { ...editModal.package, maxPeople: parseInt(e.target.value) || 0 },
-                            })
-                          }
+                          value={editModal.package.maxPeople ?? ""}
+                          onChange={(e) => handleNumberChange(e.target.value, "maxPeople")}
                           className="col-span-3"
+                          min="0"
                         />
                       </div>
                       <div className="grid grid-cols-4 items-center gap-4">
@@ -378,6 +390,44 @@ const PackageManager = () => {
                           className="col-span-3"
                         />
                       </div>
+                      {editModal.type === "safari" && (
+                        <>
+                          <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="startTime" className="text-right text-safari-forest">
+                              Start Time
+                            </Label>
+                            <Input
+                              id="startTime"
+                              type="time"
+                              value={editModal.package.startTime}
+                              onChange={(e) =>
+                                setEditModal({
+                                  ...editModal,
+                                  package: { ...editModal.package, startTime: e.target.value },
+                                })
+                              }
+                              className="col-span-3 border border-gray-300 rounded-md p-2 text-safari-forest bg-safari-cream/20 focus:ring-safari-leaf focus:border-safari-leaf"
+                            />
+                          </div>
+                          <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="endTime" className="text-right text-safari-forest">
+                              End Time
+                            </Label>
+                            <Input
+                              id="endTime"
+                              type="time"
+                              value={editModal.package.endTime}
+                              onChange={(e) =>
+                                setEditModal({
+                                  ...editModal,
+                                  package: { ...editModal.package, endTime: e.target.value },
+                                })
+                              }
+                              className="col-span-3 border border-gray-300 rounded-md p-2 text-safari-forest bg-safari-cream/20 focus:ring-safari-leaf focus:border-safari-leaf"
+                            />
+                          </div>
+                        </>
+                      )}
                       {editModal.type === "activity" && (
                         <div className="grid grid-cols-4 items-center gap-4">
                           <Label htmlFor="location" className="text-right text-safari-forest">
@@ -412,7 +462,7 @@ const PackageManager = () => {
                         <div className="grid grid-cols-4 items-center gap-4">
                           <Label className="text-right text-safari-forest">Current Image</Label>
                           <img
-                            src={editModal.package.imageUrl}
+                            src={editModal.package.imageUrl ? `http://localhost:8080${editModal.package.imageUrl}` : ""}
                             alt="Current package"
                             className="col-span-3 h-20 object-cover"
                           />
@@ -461,14 +511,11 @@ const PackageManager = () => {
                         <Input
                           id="packagePrice"
                           type="number"
-                          value={editModal.package.packagePrice}
-                          onChange={(e) =>
-                            setEditModal({
-                              ...editModal,
-                              package: { ...editModal.package, packagePrice: parseFloat(e.target.value) || 0 },
-                            })
-                          }
+                          value={editModal.package.packagePrice ?? ""}
+                          onChange={(e) => handleNumberChange(e.target.value, "packagePrice")}
                           className="col-span-3"
+                          min="0"
+                          step="0.01"
                         />
                       </div>
                       <div className="grid grid-cols-4 items-center gap-4">
@@ -478,14 +525,10 @@ const PackageManager = () => {
                         <Input
                           id="capacity"
                           type="number"
-                          value={editModal.package.capacity}
-                          onChange={(e) =>
-                            setEditModal({
-                              ...editModal,
-                              package: { ...editModal.package, capacity: parseInt(e.target.value) || 0 },
-                            })
-                          }
+                          value={editModal.package.capacity ?? ""}
+                          onChange={(e) => handleNumberChange(e.target.value, "capacity")}
                           className="col-span-3"
+                          min="0"
                         />
                       </div>
                       <div className="grid grid-cols-4 items-center gap-4">
