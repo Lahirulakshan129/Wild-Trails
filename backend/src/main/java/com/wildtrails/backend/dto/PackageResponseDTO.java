@@ -12,6 +12,7 @@ public class PackageResponseDTO {
     private String imageUrl;
     private String details;
     private Integer maxPeople;
+    private String time;
     private String vehicleType;
     private String tourName;
     private Integer capacity;

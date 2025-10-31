@@ -30,8 +30,10 @@ public class Booking {
     @JoinColumn(name = "driver_id")
     private Driver driver;
 
-//    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
-//    private Review review;
+    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Review review;
+
+    private boolean reviewed = false;
 
     @Temporal(TemporalType.DATE) // Specify only date (no time)
     private Date date;

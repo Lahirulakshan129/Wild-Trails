@@ -1,38 +1,48 @@
-import TourCard from './TourCard';
+import { useEffect, useState } from "react";
+import TourCard from "./TourCard";
 
 export default function ToursSection() {
-  const tours = [
-    {
-      id: 1,
-      image: '/src/assets/image1.jpeg', // Updated path
-      title: 'Morning Safari',
-      time: '6.00 am to 11.00 am',
-      duration: '5 hours',
-      maxPeople: 10,
-    },
-    {
-      id: 2,
-      image: '/src/assets/image2.jpg', // Updated path
-      title: 'Full Day Safari',
-      time: '6.00 am to 4.00 pm',
-      duration: '10 hours',
-      maxPeople: 10,
-    },
-    {
-      id: 3,
-      image: '/src/assets/image3.jpg', // Updated path
-      title: 'Evening Safari',
-      time: '2.00 pm to 5.00 pm',
-      duration: '3 hours',
-      maxPeople: 10,
-    }
-  ];
+  const [safariPackages, setSafariPackages] = useState([]);
+
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/api/packages");
+        const data = await response.json();
+
+        // Filter only SAFARI packages
+        const safaris = data.filter(pkg => pkg.packageType === "SAFARI");
+        setSafariPackages(safaris);
+      } catch (error) {
+        console.error("Error fetching packages:", error);
+      }
+    };
+
+    fetchPackages();
+  }, []);
+
+  // Function to calculate duration in hours from "HH:mm-HH:mm"
+  const calculateDuration = (timeRange) => {
+    if (!timeRange || !timeRange.includes("-")) return "—";
+    const [start, end] = timeRange.split("-");
+    const [startH, startM] = start.split(":").map(Number);
+    const [endH, endM] = end.split(":").map(Number);
+
+    const startDate = new Date(0, 0, 0, startH, startM);
+    const endDate = new Date(0, 0, 0, endH, endM);
+    const diffMs = endDate - startDate;
+    const diffHours = diffMs / (1000 * 60 * 60);
+
+    return `${diffHours} hours`;
+  };
 
   return (
     <section id="tours" className="py-16 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-safari-charcoal font-caveat text-4xl font-normal mb-4">Explore The Wild</h2>
+          <h2 className="text-safari-charcoal font-caveat text-4xl font-normal mb-4">
+            Explore The Wild
+          </h2>
           <div className="max-w-3xl mx-auto">
             <p className="font-aref font-bold text-safari-charcoal/80 mb-2">
               Venture deep into Kumana's wild heart with our expertly guided safaris, tailored for every type of explorer.
@@ -44,13 +54,13 @@ export default function ToursSection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {tours.map(tour => (
+          {safariPackages.map((tour) => (
             <TourCard
-              key={tour.id}
-              image={tour.image}
-              title={tour.title}
-              time={tour.time}
-              duration={tour.duration}
+              key={tour.packageID}
+              image={`http://localhost:8080${tour.imageUrl}`}
+              title={tour.packageName}
+              time={tour.time || "—"}
+              duration={calculateDuration(tour.time)}
               maxPeople={tour.maxPeople}
             />
           ))}

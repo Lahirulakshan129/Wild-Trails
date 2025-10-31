@@ -7,6 +7,9 @@ import Unauthorized from './Pages/util/UnauthorizedPage';
 import AdminDashboard from './Pages/AdminDashboard';
 import UserDashboard from './Pages/UserDashboard/UserDashboard';
 import AdminDashboardPackages from './Pages/AdminDashboard/Packages';
+import SafariPackages from './Pages/Packages/SafariPackages';
+import ActivityPackages from './Pages/Packages/ActivityPackages';
+import HirePackages from './Pages/Packages/HirePackages';
 import { Toaster } from 'react-hot-toast';
 
 
@@ -45,6 +48,9 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route path="/Packages/safari_packages" element={<SafariPackages />} />
+      <Route path="/Packages/activity_packages" element={<ActivityPackages />} />
+      <Route path="/Packages/hire_packages" element={<HirePackages />} />
     </Routes>
     </>
   );
