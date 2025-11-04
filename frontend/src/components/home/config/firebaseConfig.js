@@ -1,15 +1,16 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-    apiKey: "AIzaSyAy7Arh2eNX9BpgKZGFXNmoz4ygRDkS8n0",
-    authDomain: "wildtrails-60d05.firebaseapp.com",
-    projectId: "wildtrails-60d05",
-    storageBucket: "wildtrails-60d05.firebasestorage.app",
-    messagingSenderId: "830817617971",
-    appId: "1:830817617971:web:047a57bbc5e6cdbcf7bb46",
-    measurementId: "G-LWNT8CW6B3"
-  };
+  apiKey: "AIzaSyCYyl6SaMzNKPafdj-KgW__kCkjxSY9akA",
+  authDomain: "wild-trails-safari.firebaseapp.com",
+  projectId: "wild-trails-safari",
+  storageBucket: "wild-trails-safari.firebasestorage.app",
+  messagingSenderId: "298549071871",
+  appId: "1:298549071871:web:50de4dd79be08ee39221ca",
+  measurementId: "G-1PC0VL11EB"
+};
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();

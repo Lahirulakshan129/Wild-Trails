@@ -30,12 +30,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
+            HttpServletResponse response,
+            FilterChain filterChain)
             throws ServletException, IOException {
 
         String requestUri = request.getRequestURI();
         logger.info("JwtAuthenticationFilter processing URI: {}", requestUri);
+
+        String path = request.getRequestURI();
+        if (path.startsWith("/ws-sightings") || path.startsWith("/ws")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         if (requestUri.startsWith("/api/auth/firebase/") || requestUri.equals("/api/auth/firebase")) {
             logger.info("Skipping JwtAuthenticationFilter for Firebase endpoint: {}", requestUri);
@@ -75,11 +81,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 logger.info("Extracted role from JWT: {}", role);
                 logger.info("UserDetails authorities: {}", userDetails.getAuthorities());
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities()
-                );
+                        userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                logger.info("JWT authentication successful for email: {} with authorities: {}", email, authentication.getAuthorities());
+                logger.info("JWT authentication successful for email: {} with authorities: {}", email,
+                        authentication.getAuthorities());
             } else {
                 logger.warn("Invalid JWT token for URI: {}", requestUri);
             }

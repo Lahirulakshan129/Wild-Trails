@@ -53,8 +53,7 @@ public class AuthService {
         driver.setSeating_capacity(request.getSeatingCapacity());
         driver.set_available(true); 
         driverRepository.save(driver); 
-    
-        // 3. Return a dummy AuthResponse (no token needed here)
+
         return AuthResponse.builder()
                 .message("Driver registered successfully")
                 .build();

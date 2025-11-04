@@ -1,7 +1,10 @@
+import { useState } from "react";
+import PendingReviews from "./PendingReviews"; // adjust path
 import Button from "./Button";
-import { Link } from "react-router-dom";
 
 const ReviewsCard = () => {
+  const [showReviews, setShowReviews] = useState(false);
+
   return (
     <div className="bg-[#fef5f0] rounded-xl shadow-md p-4 sm:p-6 flex flex-col gap-4">
       {/* Header */}
@@ -15,21 +18,21 @@ const ReviewsCard = () => {
       </p>
 
       {/* Stats */}
-      <div className="flex flex-col ">      
-
-       <div className="text-3xl font-bold">7</div>
-      <div className="text-sm ">
-        {" "}
-        
-        🕒 2 safaris to review
+      <div className="flex flex-col ">
+        <div className="text-3xl font-bold">7</div>
+        <div className="text-sm">🕒 2 safaris to review</div>
       </div>
- </div>
-      {/* Button */}
-     <Link to="reviews">        <Button
-        label="Write a Review"
-        className="bg-orange-400 text-white w-full py-2 mt-2 rounded-md hover:bg-orange-500 transition duration-200 text-sm sm:text-base"
-      />
-      </Link>
+
+      {/* Button or Inline Component */}
+      {showReviews ? (
+        <PendingReviews />
+      ) : (
+        <Button
+          label="Write a Review"
+          onClick={() => setShowReviews(true)}
+          className="bg-orange-400 text-white w-full py-2 mt-2 rounded-md hover:bg-orange-500 transition duration-200 text-sm sm:text-base"
+        />
+      )}
     </div>
   );
 };
