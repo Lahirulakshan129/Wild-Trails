@@ -1,26 +1,24 @@
+import { useEffect, useState } from "react";
+
 export default function ActivitiesSection() {
-  const activities = [
-    {
-      id: 1,
-      image: "src/assets/kudumbigala.JPG",
-      title: "Kudumbigala Rock",
-    },
-    {
-      id: 2,
-      image: "src/assets/Lagoon_Boat_Tour.jpg",
-      title: "Lagoon Boat Tour",
-    },
-    {
-      id: 3,
-      image: "src/assets/Arugambay.webp",
-      title: "Surfing in Arugam Bay",
-    },
-    {
-      id: 4,
-      image: "src/assets/cooking_class.webp",
-      title: "Cooking Class",
-    },
-  ];
+  const [activities, setActivities] = useState([]);
+
+  useEffect(() => {
+    const fetchActivities = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/api/packages");
+        const data = await response.json();
+
+        // Filter only ACTIVITY packages
+        const filteredActivities = data.filter(pkg => pkg.packageType === "ACTIVITY");
+        setActivities(filteredActivities);
+      } catch (error) {
+        console.error("Error fetching activities:", error);
+      }
+    };
+
+    fetchActivities();
+  }, []);
 
   return (
     <section id="activities" className="py-16 bg-white">
@@ -43,15 +41,15 @@ export default function ActivitiesSection() {
         {/* Activity Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
           {activities.map((activity) => (
-            <div key={activity.id} className="text-center">
+            <div key={activity.packageID} className="text-center">
               <img
-                src={activity.image}
-                alt={activity.title}
+                src={`http://localhost:8080${activity.imageUrl}`}
+                alt={activity.packageName}
                 className="w-64 h-80 object-cover rounded-[2rem] mx-auto shadow-md"
               />
               <div className="mt-4">
                 <div className="w-64 mx-auto bg-[#C6E3B3] text-safari-charcoal/80 text-sm font-aref px-4 py-2 rounded-full font-medium">
-                  {activity.title}
+                  {activity.packageName}
                 </div>
               </div>
             </div>
@@ -64,7 +62,7 @@ export default function ActivitiesSection() {
             href="/#contact"
             className="font-aref bg-safari-green hover:bg-safari-light-green text-[#0D722A] px-6 py-2 rounded-full text-base font-medium transition-colors inline-block"
           >
-            Plan MY Holiday &gt;&gt;&gt;
+            Plan My Holiday &gt;&gt;&gt;
           </a>
         </div>
       </div>
