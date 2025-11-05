@@ -1,10 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ['class'],
-  content: [
-    './index.html',
-    './src/**/*.{js,ts,jsx,tsx}',
-  ],
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     fontFamily: {
       sans: ['Source Sans 3', 'ui-sans-serif', 'system-ui'],
@@ -16,7 +13,10 @@ export default {
     extend: {
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+        'gradient-conic':
+          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+          "safari-green-gradient":
+          "linear-gradient(to bottom right, #1B5E20, #2E7D32, #4CAF50, #81C784)",
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -24,65 +24,144 @@ export default {
         sm: 'calc(var(--radius) - 4px)',
       },
       colors: {
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
-        card: {
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))',
-        },
-        popover: {
-          DEFAULT: 'hsl(var(--popover))',
-          foreground: 'hsl(var(--popover-foreground))',
-        },
-        primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
-        },
-        secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))',
-        },
-        muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
-        },
-        accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))',
-        },
-        destructive: {
-          DEFAULT: 'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))',
-        },
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
-        chart: {
-          '1': 'hsl(var(--chart-1))',
-          '2': 'hsl(var(--chart-2))',
-          '3': 'hsl(var(--chart-3))',
-          '4': 'hsl(var(--chart-4))',
-          '5': 'hsl(var(--chart-5))',
-        },
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
         safari: {
-          green: '#A0DA83', // From original config
-          brown: '#78552b', // From original config
-          gold: '#d9b95c', // From original config
-          cream: '#fcf9f2', // From original config
-          charcoal: '#8e8e8e', // From original config
-          'light-green': '#4a7a4a', // From original config
-          sand: '#e6d7b8', // From original config and used in Header as safari-sand
-          black: '#111111', // From original config
-          orange: '#F4A261', // From MapView getAnimalColor (bird) and Header buttons/badge
-          forest: '#264653', // From MapView getAnimalColor (bear) and Header text
-          leopard: '#E9C46A', // From MapView getAnimalColor (leopard)
-          default: '#E76F51', // From MapView getAnimalColor (default)
-          'alert-active-bg': '#FECACA', // From MapView createAlertMarkerElement (active alerts)
-          'alert-active-fg': '#B91C1C', // From MapView createAlertMarkerElement (active alerts)
-          'alert-resolved-bg': '#BBF7D0', // From MapView createAlertMarkerElement (resolved alerts)
-          'alert-resolved-fg': '#15803D', // From MapView createAlertMarkerElement (resolved alerts)
-          teal: '#2A9D8F', // For CardDescription text
-          test:'#DBDBDB'
+          green: {
+            DEFAULT: '#A0DA83',
+            50: '#f3f9f0',
+            100: '#e6f3e0',
+            200: '#c8e6b8',
+            300: '#a0da83',
+            400: '#7fc45f',
+            500: '#5fa044',
+            600: '#4a7a4a',
+            700: '#3f663d',
+            800: '#345232',
+            900: '#2a4229',
+          },
+          brown: {
+            DEFAULT: '#78552b',
+            50: '#f7f1eb',
+            100: '#e9dbcb',
+            200: '#d4bfa4',
+            300: '#bf9f77',
+            400: '#a67b5b',
+            500: '#8d5d3e',
+            600: '#78552b',
+            700: '#624322',
+            800: '#4a2e15',
+            900: '#321e0d',
+          },
+          gold: {
+            DEFAULT: '#d9b95c',
+            50: '#fff9e8',
+            100: '#fef1c6',
+            200: '#fde38a',
+            300: '#f4ce66',
+            400: '#d9b95c',
+            500: '#c2a04a',
+            600: '#a68236',
+            700: '#856328',
+            800: '#61481b',
+            900: '#3e2e10',
+          },
+          cream: {
+            DEFAULT: '#fcf9f2',
+            50: '#ffffff',
+            100: '#fcf9f2',
+            200: '#f7f1e4',
+            300: '#f0e7d5',
+            400: '#e6d7b8',
+            500: '#d7c29e',
+            600: '#c0a77f',
+            700: '#a88b65',
+            800: '#8c7050',
+            900: '#725c42',
+          },
+          charcoal: {
+            DEFAULT: '#8e8e8e',
+            50: '#f5f5f5',
+            100: '#e0e0e0',
+            200: '#c6c6c6',
+            300: '#a8a8a8',
+            400: '#8e8e8e',
+            500: '#747474',
+            600: '#5b5b5b',
+            700: '#444444',
+            800: '#2d2d2d',
+            900: '#1a1a1a',
+          },
+          orange: {
+            DEFAULT: '#F4A261',
+            50: '#fff5eb',
+            100: '#ffe3c4',
+            200: '#ffc48a',
+            300: '#f7a75e',
+            400: '#f4a261',
+            500: '#e17f2d',
+            600: '#c6651d',
+            700: '#9e4d15',
+            800: '#76370e',
+            900: '#4d2308',
+          },
+          forest: {
+            DEFAULT: '#264653',
+            50: '#edf6f7',
+            100: '#d1e7e9',
+            200: '#a2ced4',
+            300: '#6eafb9',
+            400: '#3f8f9e',
+            500: '#2a9d8f',
+            600: '#26797a',
+            700: '#1f5c5f',
+            800: '#173f43',
+            900: '#0e282b',
+          },
+          leopard: {
+            DEFAULT: '#E9C46A',
+            50: '#fffbe6',
+            100: '#fff2b8',
+            200: '#ffe37a',
+            300: '#f9d34a',
+            400: '#e9c46a',
+            500: '#d7a82f',
+            600: '#b9861f',
+            700: '#93671a',
+            800: '#6c4b14',
+            900: '#49310e',
+          },
+          default: {
+            DEFAULT: '#E76F51',
+            50: '#fff0eb',
+            100: '#ffd6cc',
+            200: '#ffb399',
+            300: '#ff8f66',
+            400: '#f8753f',
+            500: '#E76F51',
+            600: '#d85a3b',
+            700: '#b2452d',
+            800: '#8a3120',
+            900: '#5c2014',
+          },
+          alert: {
+            active: {
+              bg: '#FECACA',
+              fg: '#B91C1C',
+            },
+            resolved: {
+              bg: '#BBF7D0',
+              fg: '#15803D',
+            },
+          },
+          teal: {
+            DEFAULT: '#2A9D8F',
+            400: '#2A9D8F',
+          },
+          test: '#DBDBDB',
         },
       },
       keyframes: {
@@ -101,8 +180,5 @@ export default {
       },
     },
   },
-  plugins: [
-    require('tailwindcss-animate'),
-    require('tailwind-scrollbar-hide'),
-  ],
-}
+  plugins: [require('tailwindcss-animate'), require('tailwind-scrollbar-hide')],
+};

@@ -26,4 +26,5 @@ public class BookingRequestDTO {
     @NotNull @Positive
     private Double totalAmount;
     private LocalDateTime bookingDate;
+    private String driverStatus = "not assigned";
 }

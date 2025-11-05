@@ -6,6 +6,7 @@ import { auth, provider } from "./config/firebaseConfig";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import toast from 'react-hot-toast';
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8080";
 
@@ -76,9 +77,9 @@ export default function   AuthModal({
           role: "CUSTOMER",
         }));
   
-        window.location.href = "/Customer_dashboard";
+        window.location.href = "/CustomerDashboard";
       } catch (err) {
-        alert("Sign-up failed: " + err.message);
+        toast.error("Sign-up failed: " + err.message);
       } finally {
         setIsLoading(false);
       }
@@ -108,7 +109,7 @@ export default function   AuthModal({
             role: "CUSTOMER",
           }));
   
-          window.location.href = "/customer/dashboard";
+          window.location.href = "/CustomerDashboard";
         } else {
           // Admin / Driver login (Spring Boot)
           const loginRes = await fetch(`${BASE_URL}/api/auth/login`, {
@@ -128,7 +129,7 @@ export default function   AuthModal({
           else if (decoded.role === "DRIVER") navigate("/DriverDashboard");
         }
       } catch (err) {
-        alert("Login failed: " + err.message);
+        toast.error("Login failed: " + err.message);
       } finally {
         setIsLoading(false);
       }

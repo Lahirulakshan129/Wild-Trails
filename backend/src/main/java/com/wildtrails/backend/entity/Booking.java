@@ -20,11 +20,12 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String status; // "finished", "upcoming", "progressing", etc.
+    private String status; //pending, confirmed, cancelled, completed
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "customer_id", nullable = true)
     private Customer customer;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "driver_id")
@@ -32,8 +33,6 @@ public class Booking {
 
     @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Review review;
-
-    private boolean reviewed = false;
 
     @Temporal(TemporalType.DATE) // Specify only date (no time)
     private Date date;

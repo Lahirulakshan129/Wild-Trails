@@ -86,7 +86,7 @@ export default function BookingHireModal({ tour, onClose }) {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full border px-4 py-2 rounded-full text-sm"
+                    className="w-full border px-4 py-2 rounded-full text-sm bg-safari-green-100"
                   />
                   <input
                     type="email"
@@ -95,7 +95,7 @@ export default function BookingHireModal({ tour, onClose }) {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full border px-4 py-2 rounded-full text-sm"
+                    className="w-full border px-4 py-2 rounded-full text-sm bg-safari-green-100"
                   />
                 </>
               )}    
@@ -106,7 +106,7 @@ export default function BookingHireModal({ tour, onClose }) {
                   value={formData.startDate}
                   onChange={handleChange}
                   required
-                  className="w-1/2 border px-4 py-2 rounded-full text-sm"
+                  className="w-1/2 border px-4 py-2 rounded-full text-sm bg-safari-green-100"
                 />
                 <input
                   type="number"
@@ -116,7 +116,7 @@ export default function BookingHireModal({ tour, onClose }) {
                   value={formData.days}
                   onChange={handleChange}
                   required
-                  className="w-1/2 border px-4 py-2 rounded-full text-sm"
+                  className="w-1/2 border px-4 py-2 rounded-full text-sm bg-safari-green-100"
                 />
               </div>
               <input
@@ -127,14 +127,14 @@ export default function BookingHireModal({ tour, onClose }) {
                 value={formData.participants}
                 onChange={handleChange}
                 required
-                className="w-full border px-4 py-2 rounded-full text-sm"
+                className="w-full border px-4 py-2 rounded-full text-sm bg-safari-green-100"
               />
               <textarea
                 name="notes"
                 placeholder="Special notes (optional)"
                 value={formData.notes}
                 onChange={handleChange}
-                className="w-full border px-4 py-2 rounded-2xl text-sm h-24"
+                className="w-full border px-4 py-2 rounded-2xl text-sm h-24 bg-safari-green-100"
               />
               <button
                 type="submit"

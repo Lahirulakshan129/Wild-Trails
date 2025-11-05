@@ -10,11 +10,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -49,12 +52,20 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
                 FirebaseToken decodedToken = firebaseAuth.verifyIdToken(idToken);
                 String email = decodedToken.getEmail();
 
+                // Save or update user and customer, and get the User entity
+                com.wildtrails.backend.entity.User user = firebaseUserService.saveOrUpdateUserAndCustomer(decodedToken);
+
+                // Assign role as authority (e.g., "ROLE_CUSTOMER")
+                List<GrantedAuthority> authorities = Collections.singletonList(
+                        new SimpleGrantedAuthority("ROLE_" + user.getRole().name())
+                );
+
                 UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(email, null, Collections.emptyList());
+                        new UsernamePasswordAuthenticationToken(email, null, authorities);
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                log.info("Firebase authentication successful for email: {}", email);
+                log.info("Firebase authentication successful for email: {} with authorities: {}", email, authorities);
 
             } catch (Exception e) {
                 log.error("Firebase token verification failed", e);
