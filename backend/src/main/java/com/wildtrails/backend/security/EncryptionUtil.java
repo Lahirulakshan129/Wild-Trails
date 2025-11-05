@@ -6,7 +6,7 @@ import java.util.Base64;
 
 public class EncryptionUtil {
 
-    private static final String SECRET = "MySuperSecretKey"; // 16 chars for AES
+    private static final String SECRET = "Wildtrails@21401";
 
     public static String encrypt(String strToEncrypt) {
         try {

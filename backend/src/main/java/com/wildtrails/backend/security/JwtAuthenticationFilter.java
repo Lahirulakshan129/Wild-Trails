@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -18,7 +17,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Base64;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -30,20 +28,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain)
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
             throws ServletException, IOException {
 
         String requestUri = request.getRequestURI();
         logger.info("JwtAuthenticationFilter processing URI: {}", requestUri);
 
-        String path = request.getRequestURI();
-        if (path.startsWith("/ws-sightings") || path.startsWith("/ws")) {
+        // Skip WebSocket endpoints
+        if (requestUri.startsWith("/ws-sightings") || requestUri.startsWith("/ws")) {
+            logger.debug("Skipping JwtAuthenticationFilter for WebSocket endpoint: {}", requestUri);
             filterChain.doFilter(request, response);
             return;
         }
 
+        // Skip Firebase endpoints
         if (requestUri.startsWith("/api/auth/firebase/") || requestUri.equals("/api/auth/firebase")) {
+            logger.info("Skipping JwtAuthenticationFilter for Firebase endpoint: {}", requestUri);
+            filterChain.doFilter(request, response);
+            return;
+        }
+        if (requestUri.startsWith("/api/auth/customer/") || requestUri.equals("/api/auth/customer")) {
             logger.info("Skipping JwtAuthenticationFilter for Firebase endpoint: {}", requestUri);
             filterChain.doFilter(request, response);
             return;
@@ -58,18 +63,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String jwtToken = authHeader.substring(7);
+
+        // Check for Firebase token before attempting to parse with JwtService
+        if (isFirebaseToken(jwtToken)) {
+            logger.debug("Firebase token detected for URI: {}, skipping JWT processing", requestUri);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String email = null;
         try {
             email = jwtService.extractUsername(jwtToken);
             logger.info("Extracted email: {}", email);
         } catch (Exception e) {
-            logger.error("Error extracting email from token: {}", e.toString(), e);
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        if (isFirebaseToken(jwtToken)) {
-            logger.debug("Firebase token detected for URI: {}, skipping JWT processing", requestUri);
+            logger.error("Error extracting email from token: {}", e.getMessage(), e);
             filterChain.doFilter(request, response);
             return;
         }

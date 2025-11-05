@@ -23,7 +23,7 @@ public class Review {
     @Column(columnDefinition = "TEXT")
     private String comment;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "booking_id", nullable = false)
     private Booking booking;
 

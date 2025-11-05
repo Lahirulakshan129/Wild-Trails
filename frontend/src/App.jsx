@@ -10,6 +10,8 @@ import AdminDashboardPackages from './Pages/AdminDashboard/Packages';
 import SafariPackages from './Pages/Packages/SafariPackages';
 import ActivityPackages from './Pages/Packages/ActivityPackages';
 import HirePackages from './Pages/Packages/HirePackages';
+import BookingComplete from './Pages/util/BookingComplete';
+import BookingDetails from "./Pages/Booking/BookingDetails";
 import { Toaster } from 'react-hot-toast';
 
 
@@ -51,6 +53,8 @@ function App() {
       <Route path="/Packages/safari_packages" element={<SafariPackages />} />
       <Route path="/Packages/activity_packages" element={<ActivityPackages />} />
       <Route path="/Packages/hire_packages" element={<HirePackages />} />
+      <Route path="/booking/complete" element={<BookingComplete />} />
+      <Route path="/Booking/:encryptedId" element={<BookingDetails />} />
     </Routes>
     </>
   );
