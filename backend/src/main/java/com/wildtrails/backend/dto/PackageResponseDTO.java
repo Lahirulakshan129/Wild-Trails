@@ -17,4 +17,5 @@ public class PackageResponseDTO {
     private String tourName;
     private Integer capacity;
     private String location;
+    private String timeSlots;
 }

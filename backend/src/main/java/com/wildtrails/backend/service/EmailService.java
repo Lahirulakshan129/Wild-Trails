@@ -50,9 +50,9 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
 
             helper.setTo(toEmail);
-            helper.setFrom(new InternetAddress("wildtrails.booking@gmail.com", "Kumana TrailMate"));
+            helper.setFrom(new InternetAddress("wildtrails.booking@gmail.com", "Kumana WildTrails"));
             helper.setSubject(subject);
-            helper.setText(htmlContent, true); // ✅ true = HTML content
+            helper.setText(htmlContent, true);
 
             mailSender.send(message);
 

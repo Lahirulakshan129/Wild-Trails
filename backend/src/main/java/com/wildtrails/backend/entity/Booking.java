@@ -49,6 +49,8 @@ public class Booking {
     private LocalDateTime bookingDate;
     private LocalDateTime updatedAt;
     private String driverStatus; // "assigned", "not assigned", etc.
+    private String timeSlots;
+    private Integer hiredDays;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "packageId")

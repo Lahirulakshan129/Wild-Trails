@@ -27,10 +27,8 @@ public class PackageService {
     public PackageResponseDTO createPackage(PackageRequestDTO dto) throws IOException {
         Package pkg = new Package();
 
-        // Copy common fields except image and type
         BeanUtils.copyProperties(dto, pkg, "imageFile", "packageType");
 
-        // Convert string → enum safely
         pkg.setPackageType(PackageType.valueOf(dto.getPackageType().toUpperCase()));
 
         // Save image if uploaded

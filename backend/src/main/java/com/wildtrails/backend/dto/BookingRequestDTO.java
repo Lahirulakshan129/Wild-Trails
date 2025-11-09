@@ -26,5 +26,7 @@ public class BookingRequestDTO {
     @NotNull @Positive
     private Double totalAmount;
     private LocalDateTime bookingDate;
-    private String driverStatus = "not assigned";
+    private String driverStatus;
+    private String timeSlot ;
+    private Integer hiredDays;
 }
