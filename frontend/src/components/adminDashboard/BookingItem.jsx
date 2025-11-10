@@ -28,7 +28,8 @@ import {
   SelectValue,
 } from "@/components/ui/home-ui/Select";
 import { Avatar, AvatarFallback } from "@/components/ui/home-ui/Avatar";
-
+const token = localStorage.getItem("token");
+const BASE_URL = process.env.VITE_BACKEND_URL || "http://localhost:8080";
 const getStatusBadge = (status) => {
   switch (status) {
     case "pending":
@@ -115,8 +116,17 @@ const formatTime = (timeString) => {
 // Fetch available drivers from backend
 const fetchAvailableDrivers = async (safariDate) => {
   try {
+    const formData = new FormData();
+    formData.append("bookingDate", safariDate);
     const response = await fetch(
-      `/api/admin/getAvailableDrivers?bookingDate=${encodeURIComponent(safariDate)}`
+      `${BASE_URL}/api/admin/getAvailableDrivers?bookingDate=${safariDate}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body:formData,
+      },
     );
     
     if (!response.ok) {
@@ -124,7 +134,6 @@ const fetchAvailableDrivers = async (safariDate) => {
     }
     
     const drivers = await response.json();
-    // Map backend driver structure to frontend expectations
     return drivers
       .filter(d => d.isAvailable)
       .map(d => ({
@@ -204,7 +213,7 @@ const BookingItem = ({ booking }) => {
     if (!selectedDriverId) return;
     
     try {
-      const response = await fetch(`/api/admin/bookings/${id}/assign-driver`, {
+      const response = await fetch(`${BASE_URL}/api/admin/bookings/${id}/assign-driver`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -225,8 +234,6 @@ const BookingItem = ({ booking }) => {
       setCurrentStatus("confirmed");
       setAssignOpen(false);
       
-      // Optionally refresh the booking list
-      window.location.reload();
     } catch (error) {
       console.error("Error assigning driver:", error);
       alert("Failed to assign driver. Please try again.");
@@ -301,7 +308,7 @@ const BookingItem = ({ booking }) => {
     if (!cancelReason.trim()) return;
 
     try {
-      const response = await fetch(`/api/admin/bookings/${id}/cancel`, {
+      const response = await fetch(`${BASE_URL}/api/admin/bookings/${id}/cancel`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

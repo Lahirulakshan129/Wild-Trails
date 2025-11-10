@@ -11,7 +11,7 @@ public class BookingResponseDTO {
     private Long id;
     private String packageName;
     private String safariDate;
-    private String status;
+    private String status;//    private String status; //pending, confirmed, cancelled, completed
     private Double totalAmount;
     private String customerEmail;
     private String guestUserName;
@@ -19,4 +19,8 @@ public class BookingResponseDTO {
     private String guestUserPhone;
     private String paymentStatus;
     private String driverStatus;
+    private String BookingDate;
+    private String BookingTime;
+    private String CustomerName;
+    private String DriverName;
 }

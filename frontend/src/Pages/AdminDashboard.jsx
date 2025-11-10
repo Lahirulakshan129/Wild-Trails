@@ -62,32 +62,35 @@ const AdminDashboard = () => {
   const fetchBookings = async () => {
     try {
       setLoading(true);
-  
+
       //const today = new Date().toISOString();
-      const today = "2024-11-06T11:36:00.000Z"
-  
-      const response = await fetch(`${backendUrl}/api/admin/getAllUpcomingBooking`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ today }),
-      });
-  
+      const today = "2024-11-06T11:36:00.000Z";
+
+      const response = await fetch(
+        `${backendUrl}/api/admin/getAllUpcomingBooking`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ today }),
+        }
+      );
+
       if (!response.ok) {
         throw new Error("Failed to fetch bookings");
       }
-  
+
       const data = await response.json();
       setBookings(data);
-  
+
       const todayDate = new Date().toISOString().split("T")[0];
       const todaySafaris = data.filter((booking) => {
         const safariDate = booking.safariDate?.split("T")[0];
         return safariDate === todayDate && booking.status !== "cancelled";
       });
-  
+
       setTodaysSafaris(todaySafaris);
     } catch (error) {
       console.error("Error fetching bookings:", error);
@@ -97,7 +100,7 @@ const AdminDashboard = () => {
       setLoading(false);
     }
   };
-    
+
   // Format time for display
   const formatTime = (timeString) => {
     if (!timeString) return "";
@@ -161,8 +164,18 @@ const AdminDashboard = () => {
             </div>
 
             <div className="flex flex-wrap gap-3">
-              <button className="bg-safari-forest text-white px-4 py-2 rounded hover:bg-safari-leaf transition">
-                Driver Management
+              <button
+                onClick={() =>
+                  navigate("/adminDashboard/BookingManagement", {
+                    state: {
+                      bookings: filteredBookings, // Rename to avoid confusion
+                      fromDashboard: true,
+                    },
+                  })
+                }
+                className="bg-safari-forest text-white px-4 py-2 rounded hover:bg-safari-leaf transition"
+              >
+                Booking Management
               </button>
               <button
                 onClick={() => navigate("/adminDashboard/packages")}
@@ -198,7 +211,9 @@ const AdminDashboard = () => {
                         onClick={fetchBookings}
                         disabled={loading}
                       >
-                        <RefreshCwIcon className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                        <RefreshCwIcon
+                          className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
+                        />
                       </Button>
                     </div>
                   </CardHeader>
@@ -232,15 +247,16 @@ const AdminDashboard = () => {
                                 </div>
                                 <div className="text-xs text-gray-500">
                                   {safari.numAdults}{" "}
-                                  {safari.numAdults === 1 ? "guest" : "guests"} •{" "}
-                                  {safari.packageName}
+                                  {safari.numAdults === 1 ? "guest" : "guests"}{" "}
+                                  • {safari.packageName}
                                 </div>
                               </div>
                               <Badge
                                 variant="outline"
                                 className={`
                                   ${
-                                    status === "in-progress" || status === "completed"
+                                    status === "in-progress" ||
+                                    status === "completed"
                                       ? "bg-green-50 text-green-600 border-green-200"
                                       : ""
                                   }
@@ -258,7 +274,9 @@ const AdminDashboard = () => {
                               >
                                 {status === "in-progress" ? "In Progress" : ""}
                                 {status === "completed" ? "Completed" : ""}
-                                {status === "starting-soon" ? "Starting Soon" : ""}
+                                {status === "starting-soon"
+                                  ? "Starting Soon"
+                                  : ""}
                                 {status === "scheduled" ? "Scheduled" : ""}
                               </Badge>
                             </div>
@@ -292,7 +310,9 @@ const AdminDashboard = () => {
                           </div>
                         </div>
                         <div className="border rounded-md p-2 text-center">
-                          <div className="text-xs text-gray-500">Total Bookings</div>
+                          <div className="text-xs text-gray-500">
+                            Total Bookings
+                          </div>
                           <div className="text-lg font-bold text-safari-forest">
                             {bookings.length}
                           </div>
@@ -310,7 +330,7 @@ const AdminDashboard = () => {
               </div>
             </section>
 
-            <section id="bookings" className="pt-4">
+            {/* <section id="bookings" className="pt-4">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-playfair font-bold text-safari-forest">
                   Booking Management
@@ -369,7 +389,7 @@ const AdminDashboard = () => {
                   ))}
                 </div>
               )}
-            </section>
+            </section> */}
 
             {/* Reviews and Loyalty */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4">
@@ -405,4 +425,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;  
+export default AdminDashboard;

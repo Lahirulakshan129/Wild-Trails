@@ -45,7 +45,7 @@ public class Booking {
     private Date safariDate;
     private String pickupLocation;
     private Double totalAmount;
-    private String paymentStatus;
+    private String paymentStatus; //pending , completed, failed
     private LocalDateTime bookingDate;
     private LocalDateTime updatedAt;
     private String driverStatus; // "assigned", "not assigned", etc.
