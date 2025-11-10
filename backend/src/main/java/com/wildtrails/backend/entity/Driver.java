@@ -19,6 +19,4 @@ public class Driver {
     private String vehicle_type;
     private int seating_capacity;
     private boolean is_available;
-
-   
 }

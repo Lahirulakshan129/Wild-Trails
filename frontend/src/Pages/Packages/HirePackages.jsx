@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import BookingSafariModal from "../../components/booking/BookingSafariModal";
+import BookingHireModal from "../../components/booking/BookingHireModal";
 
 export default function TourPackages() {
   const [tours, setTours] = useState([]);
@@ -65,7 +65,7 @@ export default function TourPackages() {
         </div>
 
         {selectedTour && (
-          <BookingSafariModal safari={selectedTour} onClose={() => setSelectedTour(null)} />
+            <BookingHireModal tour={selectedTour} onClose={() => setSelectedTour(null)} />
         )}
       </div>
     </section>

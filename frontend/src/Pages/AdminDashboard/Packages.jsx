@@ -39,6 +39,10 @@ const PackageManager = () => {
     packageId: null,
   });
   const [error, setError] = useState(null);
+  
+  const [timeSlots, setTimeSlots] = useState([]);
+  const [newSlotStart, setNewSlotStart] = useState("");
+  const [newSlotEnd, setNewSlotEnd] = useState("");
 
   useEffect(() => {
     const storedAdmin = localStorage.getItem("admin");
@@ -53,24 +57,29 @@ const PackageManager = () => {
   const handleAddPackage = (type) => {
     setSelectedFile(null);
     setError(null);
+    setTimeSlots([]); // Reset time slots
+    setNewSlotStart("");
+    setNewSlotEnd("");
+    
     setEditModal({
       open: true,
       type,
       package: {
         packageID: null,
         packageName: "",
-        packagePrice: null, // Changed to null
+        packagePrice: null,
         packageType: type.toUpperCase(),
         imageUrl: "",
         details: "",
-        maxPeople: null, // Changed to null
+        maxPeople: null,
         vehicleType: "",
         tourName: "",
-        capacity: null, // Changed to null
+        capacity: null,
         time: "",
         startTime: "07:00",
         endTime: "16:00",
-        location: "", 
+        location: "",
+        timeSlots: [], // Add time slots field
       },
     });
   };
@@ -81,6 +90,33 @@ const PackageManager = () => {
       ...editModal,
       package: { ...editModal.package, imageFile: e.target.files[0] },
     });
+  };
+
+  // Add a new time slot
+  const handleAddTimeSlot = () => {
+    if (!newSlotStart || !newSlotEnd) {
+      setError("Please select both start and end times for the time slot.");
+      return;
+    }
+    if (newSlotStart >= newSlotEnd) {
+      setError("End time must be after start time.");
+      return;
+    }
+    const newSlot = `${newSlotStart}-${newSlotEnd}`;
+    if (timeSlots.includes(newSlot)) {
+      setError("This time slot already exists.");
+      return;
+    }
+
+    setTimeSlots([...timeSlots, newSlot]);
+    setNewSlotStart("");
+    setNewSlotEnd("");
+    setError(null);
+  };
+
+  // Remove a time slot
+  const handleRemoveTimeSlot = (index) => {
+    setTimeSlots(timeSlots.filter((_, i) => i !== index));
   };
 
   const handleSaveEdit = async () => {
@@ -97,6 +133,7 @@ const PackageManager = () => {
       if (!pkg.packageName) errors.push("Package name is required.");
       if (!pkg.packagePrice || pkg.packagePrice <= 0) errors.push("Price must be greater than 0.");
       if (!pkg.location) errors.push("Location is required.");
+      if (timeSlots.length === 0) errors.push("At least one time slot is required.");
     } else if (type === "hire") {
       if (!pkg.vehicleType) errors.push("Vehicle type is required.");
       if (!pkg.tourName) errors.push("Tour name is required.");
@@ -108,11 +145,8 @@ const PackageManager = () => {
       return;
     }
 
-    // Construct FormData based on package type
     const formData = new FormData();
     formData.append("packageType", type.toUpperCase());
-
-    // Generate packageName for Hire packages
     const packageName = type === "hire" ? `${pkg.vehicleType} - ${pkg.tourName}` : pkg.packageName;
     formData.append("packageName", packageName || "");
 
@@ -124,6 +158,7 @@ const PackageManager = () => {
       formData.append("maxPeople", pkg.maxPeople || 0);
       formData.append("details", pkg.details || "");
       formData.append("location", pkg.location || "");
+      formData.append("timeSlots", JSON.stringify(timeSlots));
     } else if (type === "hire") {
       formData.append("vehicleType", pkg.vehicleType || "");
       formData.append("tourName", pkg.tourName || "");
@@ -131,11 +166,9 @@ const PackageManager = () => {
     }
     formData.append("packagePrice", pkg.packagePrice || 0);
     if (selectedFile) formData.append("imageFile", selectedFile);
-
     try {
       const method = pkg.packageID ? "PUT" : "POST";
       const url = pkg.packageID ? `${API_BASE}/${pkg.packageID}` : API_BASE;
-
       const res = await fetch(url, {
         method,
         headers: { Authorization: `Bearer ${token}` },
@@ -150,6 +183,7 @@ const PackageManager = () => {
       fetchPackages();
       setEditModal({ open: false, type: "", package: null });
       setSelectedFile(null);
+      setTimeSlots([]);
       setError(null);
     } catch (err) {
       console.error("Error saving package:", err);
@@ -162,12 +196,26 @@ const PackageManager = () => {
       setError("Cannot edit package: Invalid package ID.");
       return;
     }
-
-    // Parse time field (e.g., "07:00-16:00") into startTime and endTime
     const [startTime, endTime] = pkg.time ? pkg.time.split("-") : ["07:00", "16:00"];
+
+    let parsedTimeSlots = [];
+    if (type === "activity" && pkg.timeSlots) {
+      try {
+        parsedTimeSlots = typeof pkg.timeSlots === "string" 
+          ? JSON.parse(pkg.timeSlots) 
+          : pkg.timeSlots;
+      } catch (e) {
+        console.error("Error parsing time slots:", e);
+        parsedTimeSlots = [];
+      }
+    }
 
     setSelectedFile(null);
     setError(null);
+    setTimeSlots(parsedTimeSlots);
+    setNewSlotStart("");
+    setNewSlotEnd("");
+    
     setEditModal({
       open: true,
       type,
@@ -186,6 +234,7 @@ const PackageManager = () => {
         startTime: startTime || "07:00",
         endTime: endTime || "16:00",
         location: pkg.location || "",
+        timeSlots: parsedTimeSlots,
         imageFile: null,
       },
     });
@@ -207,7 +256,6 @@ const PackageManager = () => {
       setError("Cannot delete package: Invalid package ID.");
       return;
     }
-
     try {
       const res = await fetch(`${API_BASE}/${packageId}`, {
         method: "DELETE",
@@ -244,6 +292,7 @@ const PackageManager = () => {
         capacity: pkg.capacity,
         time: pkg.time,
         location: pkg.location,
+        timeSlots: pkg.timeSlots,
       }));
 
       setSafariPackages(mappedData.filter((p) => p.packageType === "SAFARI"));
@@ -318,7 +367,7 @@ const PackageManager = () => {
             open={editModal.open}
             onOpenChange={(open) => setEditModal({ ...editModal, open })}
           >
-            <DialogContent className="sm:max-w-[425px] bg-white">
+            <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-white">
               <DialogHeader>
                 <DialogTitle className="text-safari-forest font-playfair">
                   {editModal.package?.packageID ? "Edit" : "Add"} {editModal.type.charAt(0).toUpperCase() + editModal.type.slice(1)} Package
@@ -429,22 +478,86 @@ const PackageManager = () => {
                         </>
                       )}
                       {editModal.type === "activity" && (
-                        <div className="grid grid-cols-4 items-center gap-4">
-                          <Label htmlFor="location" className="text-right text-safari-forest">
-                            Location
-                          </Label>
-                          <Input
-                            id="location"
-                            value={editModal.package.location}
-                            onChange={(e) =>
-                              setEditModal({
-                                ...editModal,
-                                package: { ...editModal.package, location: e.target.value },
-                              })
-                            }
-                            className="col-span-3"
-                          />
-                        </div>
+                        <>
+                          <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="location" className="text-right text-safari-forest">
+                              Location
+                            </Label>
+                            <Input
+                              id="location"
+                              value={editModal.package.location}
+                              onChange={(e) =>
+                                setEditModal({
+                                  ...editModal,
+                                  package: { ...editModal.package, location: e.target.value },
+                                })
+                              }
+                              className="col-span-3"
+                            />
+                          </div>
+                          
+                          {/* Time Slots Section */}
+                          <div className="col-span-4 border-t pt-4">
+                            <Label className="text-safari-forest font-semibold mb-2 block">
+                              Available Time Slots
+                            </Label>
+                            
+                            {/* Add Time Slot */}
+                            <div className="flex gap-2 mb-3">
+                              <Input
+                                type="time"
+                                value={newSlotStart}
+                                onChange={(e) => setNewSlotStart(e.target.value)}
+                                placeholder="Start"
+                                className="flex-1"
+                              />
+                              <span className="flex items-center px-2 text-gray-500">to</span>
+                              <Input
+                                type="time"
+                                value={newSlotEnd}
+                                onChange={(e) => setNewSlotEnd(e.target.value)}
+                                placeholder="End"
+                                className="flex-1"
+                              />
+                              <Button
+                                type="button"
+                                onClick={handleAddTimeSlot}
+                                className="bg-safari-leaf hover:bg-safari-forest"
+                              >
+                                Add
+                              </Button>
+                            </div>
+                            
+                            {/* Display Time Slots */}
+                            {timeSlots.length > 0 && (
+                              <div className="space-y-2">
+                                {timeSlots.map((slot, index) => (
+                                  <div
+                                    key={index}
+                                    className="flex items-center justify-between bg-safari-cream/30 p-2 rounded-md"
+                                  >
+                                    <span className="text-safari-forest font-medium">
+                                      {slot.replace("-", " - ")}
+                                    </span>
+                                    <Button
+                                      type="button"
+                                      variant="destructive"
+                                      size="sm"
+                                      onClick={() => handleRemoveTimeSlot(index)}
+                                    >
+                                      Remove
+                                    </Button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            {timeSlots.length === 0 && (
+                              <p className="text-sm text-gray-500 italic">
+                                No time slots added yet. Add at least one time slot.
+                              </p>
+                            )}
+                          </div>
+                        </>
                       )}
                       <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="imageFile" className="text-right text-safari-forest">
@@ -564,6 +677,7 @@ const PackageManager = () => {
                   onClick={() => {
                     setEditModal({ open: false, type: "", package: null });
                     setSelectedFile(null);
+                    setTimeSlots([]);
                     setError(null);
                   }}
                 >

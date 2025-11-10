@@ -60,6 +60,7 @@ export default function BookingSafariModal({ safari, onClose }) {
         safariDate: formData.safariDate,
         pickupLocation: formData.pickupLocation?.trim() || null,
         totalAmount: parseFloat(formData.totalAmount),
+        driverStatus: "not assigned",
       };
     
       console.log("Booking payload:", payload);

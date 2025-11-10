@@ -12,6 +12,7 @@ import ActivityPackages from './Pages/Packages/ActivityPackages';
 import HirePackages from './Pages/Packages/HirePackages';
 import BookingComplete from './Pages/util/BookingComplete';
 import BookingDetails from "./Pages/Booking/BookingDetails";
+import BookingMangement from './Pages/AdminDashboard/BookingManagement';
 import { Toaster } from 'react-hot-toast';
 
 
@@ -47,6 +48,14 @@ function App() {
         element={
           <ProtectedRoute requiredRole="ADMIN">
             <AdminDashboardPackages/>
+          </ProtectedRoute>
+        }
+      />
+       <Route
+        path="/AdminDashboard/BookingManagement"
+        element={
+          <ProtectedRoute requiredRole="ADMIN">
+            <BookingMangement/>
           </ProtectedRoute>
         }
       />

@@ -16,7 +16,6 @@ const SightingSummary = lazy(() =>
 const DriverManagement = lazy(() =>
   import("../components/adminDashboard/DriverManagement.jsx")
 );
-import AddDriverForm from "../components/adminDashboard/AddDriverForm";
 import {
   Card,
   CardContent,
@@ -33,13 +32,19 @@ import {
   ClockIcon,
   UsersIcon,
   XCircleIcon,
+  RefreshCwIcon,
 } from "lucide-react";
-const token = localStorage.getItem("token");
 
+const token = localStorage.getItem("token");
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const AdminDashboard = () => {
   const [activeSection, setActiveSection] = useState("overview");
   const [admin, setAdmin] = useState(null);
+  const [bookings, setBookings] = useState([]);
+  const [todaysSafaris, setTodaysSafaris] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filterStatus, setFilterStatus] = useState("all"); // all, pending, confirmed, cancelled
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,73 +54,90 @@ const AdminDashboard = () => {
     }
   }, []);
 
-  const MOCK_TODAYS_SAFARIS = [
-    {
-      id: "TS1",
-      time: "06:30 AM",
-      guide: "Ajith",
-      guests: 6,
-      status: "in-progress",
-    },
-    {
-      id: "TS2",
-      time: "07:00 AM",
-      guide: "Kumar",
-      guests: 4,
-      status: "in-progress",
-    },
-    {
-      id: "TS3",
-      time: "08:30 AM",
-      guide: "Malik",
-      guests: 2,
-      status: "starting-soon",
-    },
-    {
-      id: "TS4",
-      time: "09:30 AM",
-      guide: "Saman",
-      guests: 8,
-      status: "starting-soon",
-    },
-    {
-      id: "TS5",
-      time: "03:30 PM",
-      guide: "Nuwan",
-      guests: 5,
-      status: "scheduled",
-    },
-  ];
+  // Fetch bookings from backend
+  useEffect(() => {
+    fetchBookings();
+  }, []);
 
-  const MOCK_BOOKINGS = [
-    {
-      id: "B1",
-      customerName: "John Davis",
-      date: "May 27, 2025",
-      time: "06:30 AM",
-      persons: 4,
-      status: "pending",
-      package: "Morning Safari",
-    },
-    {
-      id: "B2",
-      customerName: "Maria Garcia",
-      date: "May 27, 2025",
-      time: "03:30 PM",
-      persons: 2,
-      status: "driver_accepted",
-      package: "Afternoon Safari",
-    },
-    {
-      id: "B3",
-      customerName: "Robert Wilson",
-      date: "May 28, 2025",
-      time: "06:00 AM",
-      persons: 6,
-      status: "pending",
-      package: "Full Day Safari",
-    },
-  ];
+  const fetchBookings = async () => {
+    try {
+      setLoading(true);
+
+      //const today = new Date().toISOString();
+      const today = "2024-11-06T11:36:00.000Z";
+
+      const response = await fetch(
+        `${backendUrl}/api/admin/getAllUpcomingBooking`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ today }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch bookings");
+      }
+
+      const data = await response.json();
+      setBookings(data);
+
+      const todayDate = new Date().toISOString().split("T")[0];
+      const todaySafaris = data.filter((booking) => {
+        const safariDate = booking.safariDate?.split("T")[0];
+        return safariDate === todayDate && booking.status !== "cancelled";
+      });
+
+      setTodaysSafaris(todaySafaris);
+    } catch (error) {
+      console.error("Error fetching bookings:", error);
+      setBookings([]);
+      setTodaysSafaris([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Format time for display
+  const formatTime = (timeString) => {
+    if (!timeString) return "";
+    const [hours, minutes] = timeString.split(":");
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    const displayHour = hour % 12 || 12;
+    return `${displayHour}:${minutes} ${ampm}`;
+  };
+
+  // Get status badge for today's safaris
+  const getSafariStatus = (booking) => {
+    const now = new Date();
+    const safariTime = new Date(booking.safariDate);
+    const [hours, minutes] = booking.bookingTime.split(":");
+    safariTime.setHours(parseInt(hours), parseInt(minutes));
+
+    const diffMinutes = (safariTime - now) / (1000 * 60);
+
+    if (diffMinutes < 0) return "completed";
+    if (diffMinutes < 30) return "in-progress";
+    if (diffMinutes < 120) return "starting-soon";
+    return "scheduled";
+  };
+
+  // Filter bookings based on status
+  const filteredBookings = bookings.filter((booking) => {
+    if (filterStatus === "all") return true;
+    return booking.status === filterStatus;
+  });
+
+  // Count bookings by status
+  const bookingCounts = {
+    pending: bookings.filter((b) => b.status === "pending").length,
+    confirmed: bookings.filter((b) => b.status === "confirmed").length,
+    cancelled: bookings.filter((b) => b.status === "cancelled").length,
+  };
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
@@ -142,8 +164,18 @@ const AdminDashboard = () => {
             </div>
 
             <div className="flex flex-wrap gap-3">
-              <button className="bg-safari-forest text-white px-4 py-2 rounded hover:bg-safari-leaf transition">
-                Driver Management
+              <button
+                onClick={() =>
+                  navigate("/adminDashboard/BookingManagement", {
+                    state: {
+                      bookings: filteredBookings, // Rename to avoid confusion
+                      fromDashboard: true,
+                    },
+                  })
+                }
+                className="bg-safari-forest text-white px-4 py-2 rounded hover:bg-safari-leaf transition"
+              >
+                Booking Management
               </button>
               <button
                 onClick={() => navigate("/adminDashboard/packages")}
@@ -164,64 +196,94 @@ const AdminDashboard = () => {
 
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="font-playfair text-lg font-bold text-safari-forest">
-                      Today's Safaris
-                    </CardTitle>
-                    <CardDescription>
-                      Scheduled safari trips for today
-                    </CardDescription>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="font-playfair text-lg font-bold text-safari-forest">
+                          Today's Safaris
+                        </CardTitle>
+                        <CardDescription>
+                          Scheduled safari trips for today
+                        </CardDescription>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={fetchBookings}
+                        disabled={loading}
+                      >
+                        <RefreshCwIcon
+                          className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
+                        />
+                      </Button>
+                    </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-3">
-                      {MOCK_TODAYS_SAFARIS.map((safari) => (
-                        <div
-                          key={safari.id}
-                          className="flex justify-between items-center p-2 rounded-lg border border-gray-100"
-                        >
-                          <div>
-                            <div className="flex items-center">
-                              <span className="font-medium text-safari-forest">
-                                {safari.time}
-                              </span>
-                              <span className="mx-2 text-gray-300">•</span>
-                              <span className="text-sm">{safari.guide}</span>
+                    {loading ? (
+                      <div className="text-center py-8 text-gray-500">
+                        Loading safaris...
+                      </div>
+                    ) : todaysSafaris.length === 0 ? (
+                      <div className="text-center py-8 text-gray-500">
+                        No safaris scheduled for today
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {todaysSafaris.map((safari) => {
+                          const status = getSafariStatus(safari);
+                          return (
+                            <div
+                              key={safari.id}
+                              className="flex justify-between items-center p-2 rounded-lg border border-gray-100"
+                            >
+                              <div>
+                                <div className="flex items-center">
+                                  <span className="font-medium text-safari-forest">
+                                    {formatTime(safari.bookingTime)}
+                                  </span>
+                                  <span className="mx-2 text-gray-300">•</span>
+                                  <span className="text-sm">
+                                    {safari.driverName || "No Driver"}
+                                  </span>
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  {safari.numAdults}{" "}
+                                  {safari.numAdults === 1 ? "guest" : "guests"}{" "}
+                                  • {safari.packageName}
+                                </div>
+                              </div>
+                              <Badge
+                                variant="outline"
+                                className={`
+                                  ${
+                                    status === "in-progress" ||
+                                    status === "completed"
+                                      ? "bg-green-50 text-green-600 border-green-200"
+                                      : ""
+                                  }
+                                  ${
+                                    status === "starting-soon"
+                                      ? "bg-blue-50 text-blue-600 border-blue-200"
+                                      : ""
+                                  }
+                                  ${
+                                    status === "scheduled"
+                                      ? "bg-gray-50 text-gray-600 border-gray-200"
+                                      : ""
+                                  }
+                                `}
+                              >
+                                {status === "in-progress" ? "In Progress" : ""}
+                                {status === "completed" ? "Completed" : ""}
+                                {status === "starting-soon"
+                                  ? "Starting Soon"
+                                  : ""}
+                                {status === "scheduled" ? "Scheduled" : ""}
+                              </Badge>
                             </div>
-                            <div className="text-xs text-gray-500">
-                              {safari.guests}{" "}
-                              {safari.guests === 1 ? "guest" : "guests"}
-                            </div>
-                          </div>
-                          <Badge
-                            variant="outline"
-                            className={`
-                              ${
-                                safari.status === "in-progress"
-                                  ? "bg-green-50 text-green-600 border-green-200"
-                                  : ""
-                              }
-                              ${
-                                safari.status === "starting-soon"
-                                  ? "bg-blue-50 text-blue-600 border-blue-200"
-                                  : ""
-                              }
-                              ${
-                                safari.status === "scheduled"
-                                  ? "bg-gray-50 text-gray-600 border-gray-200"
-                                  : ""
-                              }
-                            `}
-                          >
-                            {safari.status === "in-progress"
-                              ? "In Progress"
-                              : ""}
-                            {safari.status === "starting-soon"
-                              ? "Starting Soon"
-                              : ""}
-                            {safari.status === "scheduled" ? "Scheduled" : ""}
-                          </Badge>
-                        </div>
-                      ))}
-                    </div>
+                          );
+                        })}
+                      </div>
+                    )}
 
                     <div className="mt-4 pt-4 border-t border-gray-100">
                       <div className="flex justify-between items-center">
@@ -232,6 +294,7 @@ const AdminDashboard = () => {
                           variant="outline"
                           size="sm"
                           className="h-7 text-xs"
+                          onClick={() => navigate("/adminDashboard/drivers")}
                         >
                           View All
                         </Button>
@@ -240,22 +303,24 @@ const AdminDashboard = () => {
                       <div className="grid grid-cols-3 gap-2 mt-2">
                         <div className="border rounded-md p-2 text-center">
                           <div className="text-xs text-gray-500">
-                            Active Drivers
+                            Today's Safaris
                           </div>
                           <div className="text-lg font-bold text-safari-forest">
-                            8
-                          </div>
-                        </div>
-                        <div className="border rounded-md p-2 text-center">
-                          <div className="text-xs text-gray-500">Vehicles</div>
-                          <div className="text-lg font-bold text-safari-forest">
-                            12
+                            {todaysSafaris.length}
                           </div>
                         </div>
                         <div className="border rounded-md p-2 text-center">
-                          <div className="text-xs text-gray-500">Sightings</div>
+                          <div className="text-xs text-gray-500">
+                            Total Bookings
+                          </div>
                           <div className="text-lg font-bold text-safari-forest">
-                            47
+                            {bookings.length}
+                          </div>
+                        </div>
+                        <div className="border rounded-md p-2 text-center">
+                          <div className="text-xs text-gray-500">Pending</div>
+                          <div className="text-lg font-bold text-safari-forest">
+                            {bookingCounts.pending}
                           </div>
                         </div>
                       </div>
@@ -265,42 +330,66 @@ const AdminDashboard = () => {
               </div>
             </section>
 
-            <section id="bookings" className="pt-4">
+            {/* <section id="bookings" className="pt-4">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-playfair font-bold text-safari-forest">
                   Booking Management
                 </h2>
                 <div className="flex space-x-2">
-                  <Button size="sm" variant="outline" className="h-9">
+                  <Button
+                    size="sm"
+                    variant={filterStatus === "all" ? "default" : "outline"}
+                    className="h-9"
+                    onClick={() => setFilterStatus("all")}
+                  >
+                    All ({bookings.length})
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={filterStatus === "confirmed" ? "default" : "outline"}
+                    className="h-9"
+                    onClick={() => setFilterStatus("confirmed")}
+                  >
                     <CheckCircleIcon className="h-4 w-4 mr-1" />
-                    Confirmed
+                    Confirmed ({bookingCounts.confirmed})
                   </Button>
-                  <Button size="sm" variant="outline" className="h-9">
+                  <Button
+                    size="sm"
+                    variant={filterStatus === "pending" ? "default" : "outline"}
+                    className="h-9"
+                    onClick={() => setFilterStatus("pending")}
+                  >
                     <ClockIcon className="h-4 w-4 mr-1" />
-                    Pending
+                    Pending ({bookingCounts.pending})
                   </Button>
-                  <Button size="sm" variant="outline" className="h-9">
+                  <Button
+                    size="sm"
+                    variant={filterStatus === "cancelled" ? "default" : "outline"}
+                    className="h-9"
+                    onClick={() => setFilterStatus("cancelled")}
+                  >
                     <XCircleIcon className="h-4 w-4 mr-1" />
-                    Cancelled
+                    Cancelled ({bookingCounts.cancelled})
                   </Button>
                 </div>
               </div>
 
-              <div className="space-y-1">
-                {MOCK_BOOKINGS.map((booking) => (
-                  <BookingItem
-                    key={booking.id}
-                    id={booking.id}
-                    customerName={booking.customerName}
-                    date={booking.date}
-                    time={booking.time}
-                    persons={booking.persons}
-                    status={booking.status}
-                    package={booking.package}
-                  />
-                ))}
-              </div>
-            </section>
+              {loading ? (
+                <div className="bg-white p-8 rounded-lg text-center text-gray-500">
+                  Loading bookings...
+                </div>
+              ) : filteredBookings.length === 0 ? (
+                <div className="bg-white p-8 rounded-lg text-center text-gray-500">
+                  No {filterStatus !== "all" ? filterStatus : ""} bookings found
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  {filteredBookings.map((booking) => (
+                    <BookingItem key={booking.id} booking={booking} />
+                  ))}
+                </div>
+              )}
+            </section> */}
 
             {/* Reviews and Loyalty */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4">
@@ -319,7 +408,9 @@ const AdminDashboard = () => {
             </div>
 
             {/* Driver Management Section */}
-            <DriverManagement></DriverManagement>
+            <Suspense fallback={<div>Loading driver management...</div>}>
+              <DriverManagement />
+            </Suspense>
 
             {/* Sighting Summary */}
             <section id="summary" className="pt-4 bg-white">

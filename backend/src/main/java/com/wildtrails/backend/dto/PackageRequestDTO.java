@@ -8,12 +8,13 @@ public class PackageRequestDTO {
     private String packageName;
     private Double packagePrice;
     private String packageType;
-    private MultipartFile imageFile; // for uploaded image
+    private MultipartFile imageFile;
     private String details;
-    private Integer maxPeople;      // safari
-    private String vehicleType;     // hire
-    private String tourName;        // hire
-    private Integer capacity;       // hire
+    private Integer maxPeople;
+    private String vehicleType;
+    private String tourName;
+    private Integer capacity;
     private String time;
+    private String timeSlots;
     private String location;
 }

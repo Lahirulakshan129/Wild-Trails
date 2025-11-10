@@ -34,11 +34,13 @@ public class Package {
     @Column(length = 2000)
     private String details;
     private String location;
+    private String timeSlots;
 
     // --- Hire-specific fields ---
     private String vehicleType;
     private String tourName;
     private Integer capacity;
+    private Integer noOfDays;
 
     public enum PackageType {
         SAFARI,
